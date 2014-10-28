@@ -1,3 +1,4 @@
+<!--//Written by Tadesse D. Feyissa. Oct 28, 2014.-->
 <html>
 <head>
 	<script type="text/javascript" src="libs/jquery-1.11.1.min.js"></script>
@@ -44,16 +45,12 @@
 			text-align: center;
 		}
 
-		div.todos-container{
-			border-radius: 5px;
-		}
-
-		div.add-section{
+		.add-section{
 			border-top-left-radius: 5px;	
 			border-top-right-radius: 5px;			
 		}
 
-		div.change-buttons{
+		.change-buttons{
 			border-bottom-left-radius: 5px;			
 			border-bottom-right-radius: 5px;			
 		}
@@ -62,8 +59,8 @@
 			font-size: 1em;
 			font-family: "wf_SegoeUILight","wf_SegoeUI","Segoe UI Light","Segoe WP Light","Segoe UI","Segoe","Segoe WP","Tahoma","Verdana","Arial","sans-serif";;
 			margin: 16px;
-			border: solid 1px #BBB;
 			width: 400px;
+			border-radius: 5px;
 		}
 
 		.section{
@@ -104,8 +101,9 @@
 </head>
 <body>
 <div class="todos-container"> 
+	<h3>TODO List - how to use <u>routn.js</u> library</h3>
 	<div class='section add-section'>
-		<input type='text' id='txtTodo' value='' placeholder='Enter new todo here...' size='30'/>
+		<input type='text' id='txtTodo' value='' placeholder='Enter new Todo task here...' size='30'/>
 		<input type='button' id='btnAdd' disabled="disabled" value='Add'/>
 	</div>
 	<table border="0" cellpadding="0" cellspacing="0">

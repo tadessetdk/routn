@@ -1,12 +1,14 @@
+//Written by Tadesse D. Feyissa. Oct 28, 2014.
+
 //==================================================================
-//					TODO-List Example
+//		TODO-List Example
 //==================================================================
 
 $(function(){
 
 	// model_section_begin
 
-	var PENDING = "Pending", DONE = "Done";
+	var PENDING = "PENDING", DONE = "DONE";
 
 	var todo = function(id, name, status){
 		this.id = id;
