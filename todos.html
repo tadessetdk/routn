@@ -1,0 +1,127 @@
+<html>
+<head>
+	<script type="text/javascript" src="libs/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="libs/handlebars-v2.0.0.js"></script>
+	<script type="text/javascript" src="routn.js"></script>
+	<script type="text/javascript" src="todos.js"></script>
+	<style type="text/css">
+
+		body, input{
+			font-family: "wf_SegoeUILight","wf_SegoeUI","Segoe UI Light","Segoe WP Light","Segoe UI","Segoe","Segoe WP","Tahoma","Verdana","Arial","sans-serif";
+			font-size:13px;
+		}
+
+		a{
+			color: #336699;
+			text-decoration: none;
+		}
+
+		a:hover{
+			text-decoration: underline;
+		}
+
+		table{
+			width: 100%;
+		}
+
+		th, td {
+			padding: 4px 8px;
+			border: solid 1px #CCC;
+			text-align: left;
+			font-family: "wf_SegoeUILight","wf_SegoeUI","Segoe UI Light","Segoe WP Light","Segoe UI","Segoe","Segoe WP","Tahoma","Verdana","Arial","sans-serif";;
+			font-size:1em;			
+		}
+
+		td:nth-child(2){
+			font-weight: 500;
+		}
+
+		tr.highlight-row td{
+			background-color: #F7F8E0;
+		}
+
+		td:first-child {
+			text-align: center;
+		}
+
+		div.todos-container{
+			border-radius: 5px;
+		}
+
+		div.add-section{
+			border-top-left-radius: 5px;	
+			border-top-right-radius: 5px;			
+		}
+
+		div.change-buttons{
+			border-bottom-left-radius: 5px;			
+			border-bottom-right-radius: 5px;			
+		}
+
+		.todos-container{
+			font-size: 1em;
+			font-family: "wf_SegoeUILight","wf_SegoeUI","Segoe UI Light","Segoe WP Light","Segoe UI","Segoe","Segoe WP","Tahoma","Verdana","Arial","sans-serif";;
+			margin: 16px;
+			border: solid 1px #BBB;
+			width: 400px;
+		}
+
+		.section{
+			padding: 16px 8px;
+			border: solid 1px #DDD;
+		}
+
+		.add-section{
+			background-color: #EEE;
+		}
+
+		.add-section input[type='text'] {
+			margin-left: 8px;
+			width: 80%;
+			padding: 4px 8px;
+			border-radius: 3px;
+			border: solid 1px #7DC0F3;
+		}
+
+		.add-section input[type='button'] {
+			padding: 3px 8px;
+		}
+
+		#btnToggleStatus{
+			text-align: right;
+		}
+
+	</style>
+	<script id='todos-template' type='text/x-handlebars-template'>
+		{{#each todos}}
+			<tr id='row-{{id}}'>
+				<td><input type='checkbox'/></td>
+				<td>{{name}}</td>
+				<td>{{status}}</td>
+			</tr>
+		{{/each}}
+	</script>
+</head>
+<body>
+<div class="todos-container"> 
+	<div class='section add-section'>
+		<input type='text' id='txtTodo' value='' placeholder='Enter new todo here...' size='30'/>
+		<input type='button' id='btnAdd' disabled="disabled" value='Add'/>
+	</div>
+	<table border="0" cellpadding="0" cellspacing="0">
+		<thead>
+			<th></th>
+			<th><a href="#todos/sort/1">Name</a></th>
+			<th><a href="#todos/sort/2">Status</a></th>
+		</thead>
+		<tbody id='todos-table'>			
+		</tbody>
+	</table>
+	<div class="section change-buttons">
+		<input type='button' id='btnSave' disabled="disabled" value='Save'/>
+		<input type='button' id='btnDelete' disabled="disabled" value='Delete'/>
+		<input type='button' id='btnToggleStatus' disabled="disabled" value='Toggle Status'/>
+	</div>
+</div>
+</body>
+</html>
