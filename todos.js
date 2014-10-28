@@ -8,18 +8,18 @@ $(function(){
 
 	// model_section_begin
 
-	var PENDING = "PENDING", DONE = "DONE";
+	var INCOMPLETE = "INCOMPLETE", DONE = "DONE";
 
 	var todo = function(id, name, status){
 		this.id = id;
 		this.name = name;
-		this.status = status || PENDING;
+		this.status = status || INCOMPLETE;
 	};
 
 	var todos = [
-		new todo(1, 'Code review', PENDING),
+		new todo(1, 'Code review', INCOMPLETE),
 		new todo(2, 'TechEd code complete', DONE),
-		new todo(3, 'Release-4.12', PENDING)
+		new todo(3, 'Release-4.12', INCOMPLETE)
 	];
 
 	var sortedByInfo = { name: null, ascending: true };
@@ -57,9 +57,9 @@ $(function(){
 			}
 		} ],
 
-		["/todo/add", function(ctx, next){
+		["/todos/add", function(ctx, next){
 
-			console.log('/todo/add - route detected');
+			console.log('/todos/add - route detected');
 
 			var val = $('#txtTodo').val().trim();
 
@@ -81,7 +81,7 @@ $(function(){
 			var items = todos.filter(function(t) { return t.id == ctx.params.id;});	
 			if(items.length){		
 				var d = items[0];
-				d.status = d.status == PENDING ? DONE : PENDING;
+				d.status = d.status == INCOMPLETE ? DONE : INCOMPLETE;
 				ctx.save(d);			
 				next();
 			}
@@ -136,11 +136,9 @@ $(function(){
 		var html = tmpl({todos: data});
 		$('#todos-table').html(html);
 	}
-
-	routn.navigateTo('/todos', todos);	
-
+	
 	$('#btnAdd').on('click', function(){		
-		routn.navigateTo('/todo/add');
+		routn.navigateTo('/todos/add');
 		showChangeButtons($(':checkbox').length);
 		enableAddButton(false);
 	});
@@ -188,5 +186,8 @@ $(function(){
 	});
 
 	// view_section_end
+
+	// start the app
+	routn.navigateTo('/todos', todos);	
 
 });
