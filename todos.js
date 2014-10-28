@@ -30,17 +30,22 @@ $(function(){
 
 	routn.register([
 		["*", function() { 
+
 			console.log('* - route detected');
+
 		} ],
 
 		["/todos", function(ctx){
+
 			console.log('/todos - route detected');
 
 			$('#txtTodo').val('');
 			renderTodosView(ctx.data);
+
 		} ],
 	
 		["/todo/:id/delete", function(ctx){
+
 			console.log('/todo/:id/delete - route detected');
 
 			var pos = -1;
@@ -55,6 +60,7 @@ $(function(){
 				todos.splice(pos, 1);
 				routn.navigateTo('/todos', todos);
 			}
+			
 		} ],
 
 		["/todos/add", function(ctx, next){
@@ -76,6 +82,7 @@ $(function(){
 		}],		
 
 		["/todo/:id/toggle", function(ctx, next){
+
 			console.log('/todo/:id/toggle - route detected');
 
 			var items = todos.filter(function(t) { return t.id == ctx.params.id;});	
@@ -91,6 +98,7 @@ $(function(){
 		}],	
 
 		["todos/sort/:column", function(ctx){
+
 			console.log('/todos/sort - route detected');
 
 			var column = ctx.params.column;
@@ -127,16 +135,28 @@ $(function(){
 
 	function updateStatusView(todo){
 		$('#row-' + todo.id).find('td:last-child').html(todo.status)
-		.end().find(':checkbox').trigger('click');
-
+			.end().find(':checkbox').trigger('click');
 	}   
 
 	function renderTodosView(data){
 		var tmpl = Handlebars.compile($('#todos-template').html());
-		var html = tmpl({todos: data});
-		$('#todos-table').html(html);
+		$('#todos-table').html(tmpl({todos: data}));
 	}
-	
+
+	function enableAddButton(hasContent){
+		$('#btnAdd').prop('disabled', !hasContent);
+	}
+
+	function enableChangeButtons(isChecked){
+		$('.change-buttons :button').prop('disabled', !isChecked);
+	}
+
+	function showChangeButtons(show){
+		$('.change-buttons').css('display', show ? 'block' : 'none');
+	}
+
+	// event_listeners_begin
+
 	$('#btnAdd').on('click', function(){		
 		routn.navigateTo('/todos/add');
 		showChangeButtons($(':checkbox').length);
@@ -149,28 +169,17 @@ $(function(){
 		 	$('#btnAdd').trigger('click');
 		}
 	});
-
-	function enableAddButton(hasContent){
-		$('#btnAdd').prop('disabled', !hasContent);
-	}
-
+	
 	$('tbody').on('change', ':checkbox', function(){
 		enableChangeButtons($(this).is(':checked'));
 		
 		if($('tr.highlight-row').attr('id') != $(this).closest('tr').attr('id')){
-			$('tr.highlight-row').find(':checkbox').prop('checked', false).end().removeClass('highlight-row');
+			$('tr.highlight-row').find(':checkbox').prop('checked', false)
+				.end().removeClass('highlight-row');
 		}
 			
 		$(this).closest('tr').toggleClass('highlight-row');
 	});
-
-	function enableChangeButtons(isChecked){
-		$('.change-buttons :button').prop('disabled', !isChecked);
-	}
-
-	function showChangeButtons(show){
-		$('.change-buttons').css('display', show ? 'block' : 'none');
-	}
 
 	$('#btnDelete').on('click', function(){
 		var id = $(':checkbox:checked').closest('tr').attr('id').substring(4);
@@ -184,6 +193,8 @@ $(function(){
 		var id = $(':checkbox:checked').closest('tr').attr('id').substring(4);
 		routn.navigateTo('/todo/' + id + '/toggle');
 	});
+
+	// event_listeners_end
 
 	// view_section_end
 

@@ -33,7 +33,7 @@ var routn = (function(){
 
 	function handlePathChange(path, e){
 		var context = new routeContext(path, e.state || {});
-		routn.transitionTo(context);
+		transitionTo(context, routn.routes);
 	}
 
 	var route = function(route, parts, handlers){
@@ -166,14 +166,15 @@ var routn = (function(){
 		var parts = [];
 
 		for (var i = 0; i < len; i++) {
+
 			var item = segments[i].trim(' ');
 			var part = new routePart();
 			part.name = item.replace(':', '').toLowerCase();
-			//:id format if route pattern, or numeric if actual url being routed
 			var isId = !(item.indexOf(':') === -1 && isNaN(item));
 			part.type = isId ? 'id' : 'path';
 			parts.push(part);
-		};
+
+		}
 
 		return parts;
 
@@ -197,30 +198,30 @@ var routn = (function(){
 
 	}	
 
+	function transitionTo(context, routes){
+
+		var route = parseRoute(context.url, routes);
+
+		if(route){
+			context.params = route.params;
+			executeHandler(route.handlers, context, 0);
+		}
+
+	}
+
 	return {
 
 		useHashForRouting: true,
 
-		routes: [], 
+		routes: {}, 
 
 		navigateTo: function(url, data){
 
 			var context = new routeContext();
 			context.create(url, data);
-			this.transitionTo(context);
+			transitionTo(context, this.routes);
 
 		},
-
-		transitionTo: function(context){
-
-			var route = parseRoute(context.url, this.routes);
-
-			if(route){
-				context.params = route.params;
-				executeHandler(route.handlers, context, 0);
-			}
-
-		},	
 
 		register: function(routesIn){
 
@@ -251,9 +252,6 @@ var routn = (function(){
 				this.routes[newRoute] = new route(newRoute, getUrlParts(newRoute), getRouteHandlers(routesIn[i]));
 
 			}
-
-			//sort routes by length so that we can quickly do exact match
-			this.routes.sort(function(a, b){ return a.parts.length < b.parts.length ? -1 : (a.parts.length > b.parts.length ? 1 : 0) });
 
 		}	
 
