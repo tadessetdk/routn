@@ -1,29 +1,37 @@
 //Written by Tadesse D. Feyissa. Oct 28, 2014.
 
-/*
-	// eg. route registration
-
-	register([
-		[ 'products/', function(){ }, function(){} ],
-		[ 'product/:id', function(){ }, function(){} ],
-		[ 'product/:id/edit', function(){ }, function(){} ]
-	]);
-
-	register('products/*', function(){}, function(){});
-*/
-
 var routn = (function(){
 
+	window.onclick = function(e){
+		
+		//intercept relative links and route them locally
+		//do not use document.location for routing instead use routn.navigateTo(url, stateData)
+
+		var destUrl = e.target.href;
+		if(destUrl){
+			
+			var hashIndex = destUrl.lastIndexOf('#');
+			var path = (hashIndex === -1) ? (destUrl.replace(document.location.origin, '')) 
+										 		: ('/' + destUrl.substring(hashIndex + 1));
+			
+			if(/^\/.*$/.test(path)) {
+				e.preventDefault();
+				if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+				if(e.stopPropagation) e.stopPropagation();
+				if(e.cancelBubble) e.cancelBubble = true;
+
+				routn.navigateTo(path, e.state);
+			}
+		}
+
+	}
+	
 	window.onpopstate = function(e){
-		var path = (routn.useHashForRouting && document.location.hash) ? document.location.hash.substring(1) : document.location.pathname;
-		handlePathChange(path, e);
+		handlePathChange(e);
 	}
 
 	window.onhashchange = function(e){
-		if(routn.useHashForRouting && isIE()){
-			var path = document.location.hash.substring(1);
-			handlePathChange(path, e);
-		}
+		if(isIE()) handlePathChange(e);
 	}
 
 	function isIE(){
@@ -31,7 +39,20 @@ var routn = (function(){
 	    return userAgent.indexOf('MSIE ') != -1 || userAgent.indexOf('Trident/') != -1;
 	}
 
-	function handlePathChange(path, e){
+	function handlePathChange(e){
+
+		var path = document.location.pathname;
+
+		if(routn.useHashForRouting){
+
+			if(document.location.hash){
+				path = document.location.hash.substring(1);
+			}else{
+				console.log('useHashForRouting is set, but no hash found for routing.')
+			}
+			
+		}
+		
 		var context = new routeContext(path, e.state || {});
 		transitionTo(context, routn.routes);
 	}
@@ -220,7 +241,7 @@ var routn = (function(){
 			var context = new routeContext();
 			context.create(url, data);
 			transitionTo(context, this.routes);
-			
+
 		},
 
 		register: function(routesIn){

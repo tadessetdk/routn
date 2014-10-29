@@ -97,7 +97,7 @@ $(function(){
 			updateStatusView(ctx.data);			
 		}],	
 
-		["todos/sort/:column", function(ctx){
+		["/todos/sort/:column", function(ctx){
 
 			console.log('/todos/sort - route detected');
 
