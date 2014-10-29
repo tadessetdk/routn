@@ -220,7 +220,7 @@ var routn = (function(){
 			var context = new routeContext();
 			context.create(url, data);
 			transitionTo(context, this.routes);
-
+			
 		},
 
 		register: function(routesIn){
