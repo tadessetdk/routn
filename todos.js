@@ -113,7 +113,7 @@ $(function(){
 
 			var ascending = sortedByInfo.name == key ? !sortedByInfo.ascending : true;
 
-			todos = todos.sort(function(x, y){
+			todos.sort(function(x, y){
 				var t1 = ascending ? x : y;
 				var t2 = ascending ? y : x;
 				return t1[key] > t2[key] ? 1 : (t1[key] < t2[key] ? -1 : 0);
