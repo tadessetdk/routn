@@ -2,17 +2,26 @@
 
 var routn = (function(){
 
+	window.onpopstate = function(e){
+		handlePathChange(e);
+	}
+
+	window.onhashchange = function(e){
+		if(isIE()) handlePathChange(e);
+	}
+
 	window.onclick = function(e){
 		
 		//intercept relative links and route them locally
 		//do not use document.location for routing instead use routn.navigateTo(url, stateData)
 
-		var destUrl = e.target.href;
+		var destUrl = e.target ? e.target.href : null;
 		if(destUrl){
 			
-			var hashIndex = destUrl.lastIndexOf('#');
-			var path = (hashIndex === -1) ? (destUrl.replace(document.location.origin, '')) 
-										 		: ('/' + destUrl.substring(hashIndex + 1));
+			var hashIndex = routn.useHashForRouting ? destUrl.lastIndexOf('#') : -1;
+			var path = (hashIndex === -1) 
+						? (destUrl.replace(document.location.origin, '')) 
+						: ('/' + destUrl.substring(hashIndex + 1));
 			
 			if(/^\/.*$/.test(path)) {
 				e.preventDefault();
@@ -26,14 +35,6 @@ var routn = (function(){
 
 	}
 	
-	window.onpopstate = function(e){
-		handlePathChange(e);
-	}
-
-	window.onhashchange = function(e){
-		if(isIE()) handlePathChange(e);
-	}
-
 	function isIE(){
 		var userAgent = window.navigator.userAgent;
 	    return userAgent.indexOf('MSIE ') != -1 || userAgent.indexOf('Trident/') != -1;
