@@ -18,19 +18,34 @@ var routn = (function(){
 		var destUrl = e.target ? e.target.href : null;
 		if(destUrl){
 			
-			var hashIndex = routn.useHashForRouting ? destUrl.lastIndexOf('#') : -1;
-			var path = (hashIndex === -1) 
-						? (destUrl.replace(document.location.origin, '')) 
-						: ('/' + destUrl.substring(hashIndex + 1));
-			
-			if(/^\/.*$/.test(path)) {
-				e.preventDefault();
-				if(e.stopImmediatePropagation) e.stopImmediatePropagation();
-				if(e.stopPropagation) e.stopPropagation();
-				if(e.cancelBubble) e.cancelBubble = true;
+			var path = destUrl.replace(document.location.origin, ''); 
 
-				routn.navigateTo(path, e.state);
+			//IE hash click in the document links does not trigger onhashchange event
+			var hashIndex = path.indexOf('#');	
+			var hasHash =  hashIndex !== -1;
+			
+			if((isIE() && hasHash)){							
+				path = '/' + path.substring(hashIndex + 1);	
+				navigateWithoutPropagate(e, path);			
+			} else if(!hasHash) {				
+				navigateWithoutPropagate(e, path);	
 			}
+			
+		}
+
+	}
+
+	function navigateWithoutPropagate(e, path){
+
+		if(/^\/.*$/.test(path)) {
+
+			e.preventDefault();
+			if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+			if(e.stopPropagation) e.stopPropagation();
+			if(e.cancelBubble) e.cancelBubble = true;
+
+			routn.navigateTo(path, e.state);
+
 		}
 
 	}
@@ -41,7 +56,6 @@ var routn = (function(){
 	}
 
 	function handlePathChange(e){
-
 		var path = document.location.pathname;
 
 		if(routn.useHashForRouting){
@@ -53,7 +67,7 @@ var routn = (function(){
 			}
 			
 		}
-		
+
 		var context = new routeContext(path, e.state || {});
 		transitionTo(context, routn.routes);
 	}
