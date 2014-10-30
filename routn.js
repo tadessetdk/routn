@@ -26,23 +26,25 @@ var routn = (function(){
 			
 			if((isIE() && hasHash)){							
 				path = '/' + path.substring(hashIndex + 1);	
-				navigateWithoutPropagate(e, path);			
+				navigatePropagate(e, path, true);			
 			} else if(!hasHash) {				
-				navigateWithoutPropagate(e, path);	
+				navigatePropagate(e, path);	
 			}
 			
 		}
 
 	}
 
-	function navigateWithoutPropagate(e, path){
+	function navigatePropagate(e, path, propagate){
 
 		if(/^\/.*$/.test(path)) {
 
-			e.preventDefault();
-			if(e.stopImmediatePropagation) e.stopImmediatePropagation();
-			if(e.stopPropagation) e.stopPropagation();
-			if(e.cancelBubble) e.cancelBubble = true;
+			if(!propagate){
+				e.preventDefault();
+				if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+				if(e.stopPropagation) e.stopPropagation();
+				if(e.cancelBubble) e.cancelBubble = true;
+			}
 
 			routn.navigateTo(path, e.state);
 
@@ -192,6 +194,22 @@ var routn = (function(){
 
 	}
 
+	function isValidRoute(routes, newRoute){
+
+		if(!newRoute || !newRoute.trim(' ')){
+			console.log("Empty route is not allowed; use * instead");	
+			return false;			
+		}
+
+		if(routes[newRoute]){
+			console.log(newRoute, " route is already registerd");				
+			return false;
+		}
+
+		return true;
+
+	}
+
 	function getUrlParts(url){
 
 		if(!url) return null;
@@ -265,7 +283,7 @@ var routn = (function(){
 
 			if(!routesIn || !routesIn.length){
 				console.log("No routes found");
-				return false;
+				return;
 			}
 
 			var len = routesIn.length;
@@ -274,18 +292,16 @@ var routn = (function(){
 
 				var newRoute = routesIn[i][0];
 
-				if(!newRoute || !newRoute.trim(' ')){
-					console.log("Empty route is not allowed; use * instead");	
-					continue;			
+				if(!isValidRoute(this.routes, newRoute)) {
+					continue;				
 				}
 
-				if(this.routes[newRoute]){
-					console.log(newRoute, " route is already registerd");				
-					continue;
-				}
-
-				//add the route
-				this.routes[newRoute] = new route(newRoute, getUrlParts(newRoute), getRouteHandlers(routesIn[i]));
+				this.routes[newRoute] = new route
+				(
+					newRoute, 
+					getUrlParts(newRoute), 
+					getRouteHandlers(routesIn[i])
+				);
 
 			}
 
