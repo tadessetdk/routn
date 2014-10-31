@@ -15,6 +15,7 @@
 		a{
 			color: #336699;
 			text-decoration: none;
+			font-weight: 500;
 		}
 
 		a:hover{
@@ -57,10 +58,13 @@
 		}
 
 		.change-buttons a{
-			margin-right: 4px;			
+			margin-right: 2px;			
 		}
 
-
+		.change-buttons span{
+			padding: 0 2px;	
+			border-right: solid 1px #BBB;		
+		}
 
 		.todos-container{
 			font-size: 1em;
@@ -122,8 +126,8 @@
 		</tbody>
 	</table>
 	<div class="section change-buttons">
-		<a id='lnkCompleteAll' href="javascript:void(0)">Complete All</a>
-		<a id='lnkClearSelection' href="javascript:void(0)">Clear Selection</a>
+		<span><a id='lnkCompleteAll' href="javascript:void(0)">Complete All</a></span>
+		<a id='lnkClearSelection' href="javascript:void(0)">Clear</a>
 		<input type='button' id='btnSave' disabled="disabled" value='Save'/>
 		<input type='button' id='btnDelete' disabled="disabled" value='Delete'/>
 		<input type='button' id='btnToggleStatus' disabled="disabled" value='Toggle Status'/>

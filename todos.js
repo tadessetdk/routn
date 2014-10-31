@@ -130,7 +130,7 @@ $(function(){
 		["/todos/completeall", function(ctx, next){
 
 			console.log('/todos/completeall- route detected');
-			todos.forEach(function(t){
+			ctx.data.forEach(function(t){
 				t.status = DONE;
 			});
 
@@ -138,7 +138,7 @@ $(function(){
 
 		}, function(ctx){
 
-			updateStatusView(ctx.data);			
+			renderTodosView(ctx.data);			
 
 		}],		
 
@@ -218,7 +218,8 @@ $(function(){
 
 	$('#lnkCompleteAll').on('click', function(e){
 		//will not work, navigates away; use routn.navigateTo('/todos/completeall');
-		document.location.href = document.location.origin +'/todos/completeall';
+		//document.location.href = document.location.origin +'/todos/completeall';
+		routn.navigateTo('/todos/completeall', todos);
 	});
 
 	$('#lnkClearSelection').on('click', function(e){
