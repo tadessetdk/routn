@@ -125,6 +125,28 @@ $(function(){
 
 			renderTodosView(todos);
 
+		}],		
+
+		["/todos/completeall", function(ctx, next){
+
+			console.log('/todos/completeall- route detected');
+			todos.forEach(function(t){
+				t.status = DONE;
+			});
+
+			next();
+
+		}, function(ctx){
+
+			updateStatusView(ctx.data);			
+
+		}],		
+
+		["/todos/clear", function(ctx){
+
+			console.log('/todos/clear- route detected');
+			renderTodosView(todos);			
+			
 		}]	
 
 	]);
@@ -194,11 +216,23 @@ $(function(){
 		routn.navigateTo('/todo/' + id + '/toggle');
 	});
 
+	$('#lnkCompleteAll').on('click', function(e){
+		//will not work, navigates away; use routn.navigateTo('/todos/completeall');
+		document.location.href = document.location.origin +'/todos/completeall';
+	});
+
+	$('#lnkClearSelection').on('click', function(e){
+		document.location.href = '#todos/clear';
+	});	
+
 	// event_listeners_end
 
 	// view_section_end
 
-	// start the app
+	// start_app_begin
+
 	routn.navigateTo('/todos', todos);	
+
+	// start_app_end
 
 });

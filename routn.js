@@ -2,6 +2,8 @@
 
 var routn = (function(){
 
+	"use strict";
+
 	window.onpopstate = function(e){
 		handlePathChange(e);
 	}
@@ -94,14 +96,12 @@ var routn = (function(){
 	routeContext.prototype.save = function(data){
 		this.data = data;
 		window.history.replaceState(this.data, null, this.url);
-		return this;
 	};
 
 	routeContext.prototype.create = function(url, data){
 		this.url = url;
 		this.data = data;
 		window.history.pushState(this.data, null, this.url);
-		return this;
 	};
 
 	function parseRoute(url, routes){			
@@ -277,9 +277,9 @@ var routn = (function(){
 
 		},
 
-		register: function(routesIn){
+		register: function(){
 
-			routesIn = (routesIn instanceof Array) ? routesIn : (Array.prototype.slice.apply(arguments));
+			var routesIn = (arguments && arguments[0] && (arguments[0][0] instanceof Array)) ? arguments[0] : (Array.prototype.slice.apply(arguments));
 
 			if(!routesIn || !routesIn.length){
 				console.log("No routes found");
