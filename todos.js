@@ -29,15 +29,15 @@ $(function(){
 	// routing_section_begin
 
 	routn.register([
-		["*", function() { 
+		["*", function(ctx) { 
 
-			console.log('* - route detected');
+			console.log(ctx.url, ' - route detected');
 
 		} ],
 
 		["/todos", function(ctx){
 
-			console.log('/todos - route detected');
+			console.log(ctx.url, ' - route detected');
 
 			$('#txtTodo').val('');
 			renderTodosView(ctx.data);
@@ -46,15 +46,13 @@ $(function(){
 	
 		["/todo/:id/delete", function(ctx){
 
-			console.log('/todo/:id/delete - route detected');
+			console.log(ctx.url, ' - route detected');
 
 			var pos = -1;
-			var result = todos.some(function(t) {
+			todos.some(function(t) {
 				pos++;
 				return t.id == ctx.params.id;
 			});
-
-			pos = result ? pos : -1;
 
 			if(pos >= 0){
 				todos.splice(pos, 1);
@@ -63,9 +61,33 @@ $(function(){
 			
 		} ],
 
+		["/todos/deletemany", function(ctx, next){
+
+			console.log(ctx.url, ' - route detected');
+			
+			ctx.data.forEach(function(id) {
+			
+				var pos = -1;
+			    todos.some(function(t) { 
+			   		pos++;
+			   		return t.id == id
+			   	});
+
+			    if(pos >= 0){
+					todos.splice(pos, 1);
+				}
+			   
+			});	
+
+			next();
+
+		}, function(){
+			renderTodosView(todos);			
+		}],	
+
 		["/todos/add", function(ctx, next){
 
-			console.log('/todos/add - route detected');
+			console.log(ctx.url, ' - route detected');
 
 			var val = $('#txtTodo').val().trim();
 
@@ -83,7 +105,7 @@ $(function(){
 
 		["/todo/:id/toggle", function(ctx, next){
 
-			console.log('/todo/:id/toggle - route detected');
+			console.log(ctx.url, ' - route detected');
 
 			var items = todos.filter(function(t) { return t.id == ctx.params.id;});	
 			if(items.length){		
@@ -97,9 +119,25 @@ $(function(){
 			updateStatusView(ctx.data);			
 		}],	
 
+		["/todos/togglemany", function(ctx, next){
+
+			console.log(ctx.url, ' - route detected');
+			
+			todos.forEach(function(t) {
+			   if(ctx.data.some(function(id) { return t.id == id }) ){
+			   		t.status = t.status == INCOMPLETE ? DONE : INCOMPLETE;
+			   }
+			});	
+
+			next();
+
+		}, function(){
+			renderTodosView(todos);			
+		}],	
+
 		["/todos/sort/:column", function(ctx){
 
-			console.log('/todos/sort - route detected');
+			console.log(ctx.url, ' - route detected');
 
 			var column = ctx.params.column;
 			var count = -1, key = null;
@@ -129,7 +167,7 @@ $(function(){
 
 		["/todos/completeall", function(ctx, next){
 
-			console.log('/todos/completeall- route detected');
+			console.log(ctx.url, ' - route detected');
 			
 			ctx.data.forEach(function(t){
 				t.status = DONE;
@@ -145,7 +183,7 @@ $(function(){
 
 		["/todos/clear", function(ctx){
 
-			console.log('/todos/clear- route detected');
+			console.log(ctx.url, ' - route detected');
 			renderTodosView(todos);			
 			
 		}]	
@@ -164,25 +202,36 @@ $(function(){
 	function renderTodosView(data){
 		var tmpl = Handlebars.compile($('#todos-template').html());
 		$('#todos-table').html(tmpl({todos: data}));
+		$('#chkAll').prop('checked', false).trigger('change');
 	}
 
 	function enableAddButton(hasContent){
 		$('#btnAdd').prop('disabled', !hasContent);
 	}
 
-	function showSelectionChangeButtons(isChecked){
+	function showSelectionChangeButtons(){
+		var isChecked = $('tbody :checkbox:checked').length;
 		$('.selection-change-button').css('display', isChecked ? 'inline' : 'none');
 	}
 
-	function showChangeButtons(show){
+	function showChangeButtons(){
+		var show = $('tbody :checkbox').length;
 		$('.change-buttons').css('display', show ? 'block' : 'none');
+	}
+
+	function getSelectedIds(){
+		return $('tbody :checkbox:checked').closest('tr').map(function(i, el){ return el.id.substring(4); }).get();
 	}
 
 	// event_listeners_begin
 
+	$('#chkAll').on('change', function(){
+		$('tbody :checkbox').prop('checked', $(this).is(':checked')).trigger('change');
+	});
+
 	$('#btnAdd').on('click', function(){		
 		routn.navigateTo('/todos/add');
-		showChangeButtons($(':checkbox').length);
+		showChangeButtons();
 		enableAddButton(false);
 	});
 
@@ -194,27 +243,32 @@ $(function(){
 	});
 	
 	$('tbody').on('change', ':checkbox', function(){
-		showSelectionChangeButtons($(this).is(':checked'));
-		
-		if($('tr.highlight-row').attr('id') != $(this).closest('tr').attr('id')){
-			$('tr.highlight-row').find(':checkbox').prop('checked', false)
-				.end().removeClass('highlight-row');
-		}
-			
-		$(this).closest('tr').toggleClass('highlight-row');
+		showSelectionChangeButtons();
+		$(this).is(':checked') ? ($(this).closest('tr').addClass('highlight-row')) 
+							: ($(this).closest('tr').removeClass('highlight-row'));
+		$('#chkAll').prop('checked', !($('tbody :checkbox:not(:checked)').length));
 	});
 
 	$('#btnDelete').on('click', function(){
-		var id = $(':checkbox:checked').closest('tr').attr('id').substring(4);
-		routn.navigateTo('/todo/' + id + '/delete');
+		var ids = getSelectedIds();
+		if(!ids || !ids.length) return;
+
+		var route = ids.length > 1 ? 'todos/deletemany' : '/todo/' + ids[0] + '/delete';
+		routn.navigateTo(route, ids);
 		
-		if(!$(':checkbox').length) showChangeButtons(false);
-		showSelectionChangeButtons($(':checkbox:checked').length);
+		showChangeButtons();
+		showSelectionChangeButtons();
 	});
 
 	$('#btnToggleStatus').on('click', function(){
-		var id = $(':checkbox:checked').closest('tr').attr('id').substring(4);
-		routn.navigateTo('/todo/' + id + '/toggle');
+		var ids = getSelectedIds();
+		if(!ids || !ids.length) return;
+
+		var route = ids.length > 1 ? 'todos/togglemany' : '/todo/' + ids[0] + '/toggle';
+		routn.navigateTo(route, ids);
+
+		showChangeButtons();
+		showSelectionChangeButtons();
 	});
 
 	$('#lnkCompleteAll').on('click', function(e){

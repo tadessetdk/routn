@@ -100,10 +100,6 @@
 			padding: 3px 8px;
 		}
 
-		#btnToggleStatus{
-			text-align: right;
-		}
-
 	</style>
 	<script id='todos-template' type='text/x-handlebars-template'>
 		{{#each todos}}
@@ -124,7 +120,7 @@
 	</div>
 	<table border="0" cellpadding="0" cellspacing="0">
 		<thead>
-			<th>-</th>
+			<th><input type='checkbox' id='chkAll'/></th>
 			<th><a href="#todos/sort/1">Name</a></th>
 			<th><a href="/todos/sort/2">Status</a></th>
 		</thead>
@@ -134,8 +130,7 @@
 	<div class="section change-buttons">
 		<span><a id='lnkCompleteAll' href="javascript:void(0)">Complete All</a></span>
 		<span class='selection-change-button'> 
-			<a id='lnkClearSelection' href="javascript:void(0)">Clear</a>		
-			<input type='button' id='btnSave' value='Save'/>
+			<a id='lnkClearSelection' href="javascript:void(0)">Clear</a>
 			<input type='button' id='btnDelete' value='Delete'/>
 			<input type='button' id='btnToggleStatus' value='Toggle Status'/>
 		</span>
