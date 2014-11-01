@@ -29,7 +29,7 @@
 
 		th, td {
 			padding: 4px 8px;
-			border: solid 1px #CCC;
+			border: solid 1px #EEE;
 			text-align: left;
 			font-size:1em;			
 		}
@@ -39,11 +39,12 @@
 		}
 
 		tr.highlight-row td{
-			background-color: #F7F8E0;
+			background-color: #FFC;
 		}
 
-		td:first-child {
+		td:first-child, th:first-child {
 			text-align: center;
+			font-weight: normal;
 		}
 
 		.add-section{
@@ -58,12 +59,16 @@
 		}
 
 		.change-buttons a{
-			margin-right: 2px;			
+			margin:0 2px;			
 		}
 
 		.change-buttons span{
-			padding: 0 2px;	
-			border-right: solid 1px #BBB;		
+			padding: 0 4px;	
+		}
+
+		span.selection-change-button{
+			display: none;			
+			border-left: solid 1px #CCC;		
 		}
 
 		.todos-container{
@@ -76,6 +81,7 @@
 		.section{
 			padding: 16px 8px;
 			border: solid 1px #DDD;
+			background-color: #FDFDFD;
 		}
 
 		.add-section{
@@ -118,7 +124,7 @@
 	</div>
 	<table border="0" cellpadding="0" cellspacing="0">
 		<thead>
-			<th></th>
+			<th>-</th>
 			<th><a href="#todos/sort/1">Name</a></th>
 			<th><a href="/todos/sort/2">Status</a></th>
 		</thead>
@@ -127,10 +133,12 @@
 	</table>
 	<div class="section change-buttons">
 		<span><a id='lnkCompleteAll' href="javascript:void(0)">Complete All</a></span>
-		<a id='lnkClearSelection' href="javascript:void(0)">Clear</a>
-		<input type='button' id='btnSave' disabled="disabled" value='Save'/>
-		<input type='button' id='btnDelete' disabled="disabled" value='Delete'/>
-		<input type='button' id='btnToggleStatus' disabled="disabled" value='Toggle Status'/>
+		<span class='selection-change-button'> 
+			<a id='lnkClearSelection' href="javascript:void(0)">Clear</a>		
+			<input type='button' id='btnSave' value='Save'/>
+			<input type='button' id='btnDelete' value='Delete'/>
+			<input type='button' id='btnToggleStatus' value='Toggle Status'/>
+		</span>
 	</div>
 </div>
 </body>

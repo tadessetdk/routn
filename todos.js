@@ -130,6 +130,7 @@ $(function(){
 		["/todos/completeall", function(ctx, next){
 
 			console.log('/todos/completeall- route detected');
+			
 			ctx.data.forEach(function(t){
 				t.status = DONE;
 			});
@@ -169,8 +170,8 @@ $(function(){
 		$('#btnAdd').prop('disabled', !hasContent);
 	}
 
-	function enableChangeButtons(isChecked){
-		$('.change-buttons :button').prop('disabled', !isChecked);
+	function showSelectionChangeButtons(isChecked){
+		$('.selection-change-button').css('display', isChecked ? 'inline' : 'none');
 	}
 
 	function showChangeButtons(show){
@@ -193,7 +194,7 @@ $(function(){
 	});
 	
 	$('tbody').on('change', ':checkbox', function(){
-		enableChangeButtons($(this).is(':checked'));
+		showSelectionChangeButtons($(this).is(':checked'));
 		
 		if($('tr.highlight-row').attr('id') != $(this).closest('tr').attr('id')){
 			$('tr.highlight-row').find(':checkbox').prop('checked', false)
@@ -208,7 +209,7 @@ $(function(){
 		routn.navigateTo('/todo/' + id + '/delete');
 		
 		if(!$(':checkbox').length) showChangeButtons(false);
-		enableChangeButtons($(':checkbox:checked').length);
+		showSelectionChangeButtons($(':checkbox:checked').length);
 	});
 
 	$('#btnToggleStatus').on('click', function(){
