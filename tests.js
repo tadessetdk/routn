@@ -7,33 +7,33 @@
 (function(){
 
 	routn.register([
-		["*", function() { 
-			console.log('* - route detected')
+		["*", function(ctx) { 
+			console.log(ctx.url,  ' - route detected');
 		} ],
 
-		["/", function(){
-			console.log('/ - route detected')
+		["/", function(ctx){
+			console.log(ctx.url,  ' - route detected');
 		} ],
 
-		["/products", function(){
-			console.log('/products - route detected')
+		["/products", function(ctx){
+			console.log(ctx.url,  ' - route detected');
 		} ],
 
-		["/product/:id", function(){
-			console.log('/products/:id - route detected')
+		["/product/:id", function(ctx){
+			console.log(ctx.url,  ' - route detected');
 		} ],
 
-		["/product/:id/*", function(){
-			console.log('/products/:id/* - route detected')
+		["/product/:id/*", function(ctx){
+			console.log(ctx.url,  ' - route detected');
 		} ],
 
-		["/product/:id/edit", function(){
-			console.log('/product/:id/edit - route detected')
+		["/product/:id/edit", function(ctx){
+			console.log(ctx.url,  ' - route detected');
 		} ],
 
 		["/product/:id/save", function(ctx, next){
 
-			console.log('/product/:id/save - route detected');
+			console.log(ctx.url,  ' - route detected');
 			var d = products[ctx.params.id];
 			d.rank = 7;
 			ctx.save(d);
@@ -46,7 +46,7 @@
 
 		["/product/add", function(ctx, next){
 
-			console.log('/product/add - route detected');
+			console.log(ctx.url,  ' - route detected');
 			//console.log("add view displayed");
 			next();
 			
@@ -58,8 +58,16 @@
 
 		}],		
 
-		["/product/*", function(){
-			console.log('/products/* - route detected')
+		["/product/*", function(ctx){
+			console.log(ctx.url,  ' - route detected')
+		}],		
+
+		["/products/#sort/asc", function(ctx){
+			console.log(ctx.url,  ' - route detected')
+		}],		
+
+		["/products#merge", function(ctx){
+			console.log(ctx.url,  ' - route detected')
 		}]	
 	]);
 
@@ -78,5 +86,7 @@
 	routn.navigateTo('/product/added/x');
 	routn.navigateTo('/products/add/x');
 	routn.navigateTo('/product/2/save');
+	routn.navigateTo('/products/#sort/asc');
+	routn.navigateTo('/products/#merge');
 
 })();
