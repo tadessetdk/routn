@@ -27,11 +27,11 @@
 			console.log(ctx.url,  ' - route detected');
 		} ],
 
-		["/product/:id/edit", function(ctx){
+		["/product/:id/edit", false /* do not add to history, good for update operations*/, function(ctx){
 			console.log(ctx.url,  ' - route detected');
 		} ],
 
-		["/product/:id/save", function(ctx, next){
+		["/product/:id/save", false /* do not add to history */, function(ctx, next){
 
 			console.log(ctx.url,  ' - route detected');
 			var d = products[ctx.params.id];
@@ -44,7 +44,7 @@
 			//console.log("context updated", ctx.data);
 		}],	
 
-		["/product/add", function(ctx, next){
+		["/product/add", false /* do not add to history */, function(ctx, next){
 
 			console.log(ctx.url,  ' - route detected');
 			//console.log("add view displayed");

@@ -41,6 +41,8 @@ var routn = (function(){
 
 		if(/^\/.*$/.test(path)) {
 
+			if(isIgnoreHistory(path)) propagate = false;
+
 			if(!propagate){
 				e.preventDefault();
 				if(e.stopImmediatePropagation) e.stopImmediatePropagation();
@@ -62,7 +64,7 @@ var routn = (function(){
 	function handlePathChange(e){
 		var path = document.location.pathname;
 
-		if(routn.useHashForRouting){
+		if(useHashForRouting){
 
 			if(document.location.hash){
 				path = document.location.hash.substring(1);
@@ -71,7 +73,7 @@ var routn = (function(){
 		}
 
 		var context = new routeContext(path, e.state || {});
-		transitionTo(context, routn.routes);
+		transitionTo(context);
 	}
 
 	var route = function(route, parts, handlers){
@@ -93,23 +95,34 @@ var routn = (function(){
 
 	routeContext.prototype.save = function(data){
 		this.data = data;
-		window.history.replaceState(this.data, null, this.url);
+
+		if(!isIgnoreHistory(this.url)){
+			window.history.replaceState(this.data, null, this.url);
+		}
 	};
 
 	routeContext.prototype.create = function(url, data){
 		this.url = url;
 		this.data = data;
-		window.history.pushState(this.data, null, this.url);
+		
+		if(!isIgnoreHistory(this.url)){
+			window.history.pushState(this.data, null, this.url);
+		}
 	};
 
-	function parseRoute(url, routes){			
+	function isIgnoreHistory(url) {
+		var match = parseRoute(url);
+		return match && routesNotSaved[match.route];
+	}
 
-		var match = matchRoute(url, routes);					
-		return match ? routes[match.route] : null;
+	function parseRoute(url){			
+
+		var match = matchRoute(url);					
+		return match ? registeredRoutes[match.route] : null;
 
 	}	
 
-	function matchRoute(url, routes){
+	function matchRoute(url){
 
 		if(!url) return null;
 
@@ -117,14 +130,14 @@ var routn = (function(){
 		var parts = getUrlParts(url);
 
 		//find exact match
-		var match = findMatch(routes, parts);
+		var match = findMatch(parts);
 		if(match) return match;
 
 		//else find a generic match
 		while(parts.length){
 		
 			parts[parts.length - 1].name = '*';
-			match = findMatch(routes, parts);	
+			match = findMatch(parts);	
 
 			if(match) return match;
 
@@ -136,13 +149,13 @@ var routn = (function(){
 
 	}
  
-	function findMatch(routes, searchParts) {
+	function findMatch(searchParts) {
 				
 		var matches = [];
 
-		for (var i in routes) {
-		 	if(routes[i].parts.length === searchParts.length){
-		 		matches.push(routes[i]);
+		for (var i in registeredRoutes) {
+		 	if(registeredRoutes[i].parts.length === searchParts.length){
+		 		matches.push(registeredRoutes[i]);
 		 	}
 		}
 
@@ -192,14 +205,14 @@ var routn = (function(){
 
 	}
 
-	function isValidRoute(routes, newRoute){
+	function isValidRoute(newRoute){
 
 		if(!newRoute || !newRoute.trim(' ')){
 			console.log("Empty route is not allowed; use * instead");	
 			return false;			
 		}
 
-		if(routes[newRoute]){
+		if(registeredRoutes[newRoute]){
 			console.log(newRoute, " route is already registerd");				
 			return false;
 		}
@@ -242,17 +255,19 @@ var routn = (function(){
 
 	}
 	
-	function getRouteHandlers(handlers){
+	function getRouteHandlers(handlers, ignoreHistory){
+
+		var startIndex = ignoreHistory ? 1 : 0;
 
 		return handlers.filter(function(hnd, i) { 
-			return i && (typeof(hnd) === 'function')
+			return (i > startIndex) && (typeof(hnd) === 'function')
 		});
 
 	}	
 
-	function transitionTo(context, routes){
+	function transitionTo(context){
 
-		var route = parseRoute(context.url, routes);
+		var route = parseRoute(context.url);
 
 		if(route){
 			context.params = route.params;
@@ -261,17 +276,33 @@ var routn = (function(){
 
 	}
 
+	function parseIgnoreHistory(route, keepHistory){
+
+		if((typeof keepHistory === 'boolean') && !keepHistory){
+			return (routesNotSaved[route] = true);
+		}
+
+		return false;
+
+	}
+
+	var useHashForRouting = true,
+		registeredRoutes = {}, 
+		routesNotSaved = {};
+
 	return {
 
-		useHashForRouting: true,
+		setup: function(useHash) {
 
-		routes: {}, 
+			useHashForRouting = useHash == undefined ? true : useHash;
+			
+		},
 
 		navigateTo: function(url, data){
 
 			var context = new routeContext();
 			context.create(url, data);
-			transitionTo(context, this.routes);
+			transitionTo(context);
 
 		},
 
@@ -290,15 +321,18 @@ var routn = (function(){
 
 				var newRoute = routesIn[i][0];
 
-				if(!isValidRoute(this.routes, newRoute)) {
+				if(!isValidRoute(newRoute)) {
 					continue;				
 				}
 
-				this.routes[newRoute] = new route
+				registeredRoutes[newRoute] = new route
 				(
 					newRoute, 
 					getUrlParts(newRoute), 
-					getRouteHandlers(routesIn[i])
+					getRouteHandlers(
+						routesIn[i], 
+						parseIgnoreHistory(newRoute, routesIn[i][1])
+					)
 				);
 
 			}

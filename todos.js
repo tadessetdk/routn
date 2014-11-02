@@ -44,7 +44,7 @@ $(function(){
 
 		} ],
 	
-		["/todo/:id/delete", function(ctx){
+		["/todo/:id/delete", false, function(ctx){
 
 			console.log(ctx.url, ' - route detected');
 
@@ -61,7 +61,7 @@ $(function(){
 			
 		} ],
 
-		["/todos/deletemany", function(ctx, next){
+		["/todos/deletemany", false, function(ctx, next){
 
 			console.log(ctx.url, ' - route detected');
 			
@@ -85,7 +85,7 @@ $(function(){
 			renderTodosView(todos);			
 		}],	
 
-		["/todos/add", function(ctx, next){
+		["/todos/add", false, function(ctx, next){
 
 			console.log(ctx.url, ' - route detected');
 
