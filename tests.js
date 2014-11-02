@@ -86,7 +86,7 @@
 	routn.navigateTo('/product/added/x');
 	routn.navigateTo('/products/add/x');
 	routn.navigateTo('/product/2/save');
-	routn.navigateTo('/products/#sort/asc');
-	routn.navigateTo('/products/#merge');
+	routn.navigateTo('/products/#/sort/asc');
+	routn.navigateTo('/products/#/merge');
 
 })();

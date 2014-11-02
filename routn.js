@@ -66,8 +66,6 @@ var routn = (function(){
 
 			if(document.location.hash){
 				path = document.location.hash.substring(1);
-			}else{
-				console.info('useHashForRouting is set, but no hash found for routing.')
 			}
 			
 		}

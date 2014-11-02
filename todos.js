@@ -253,7 +253,7 @@ $(function(){
 		var ids = getSelectedIds();
 		if(!ids || !ids.length) return;
 
-		var route = ids.length > 1 ? 'todos/deletemany' : '/todo/' + ids[0] + '/delete';
+		var route = ids.length > 1 ? '/todos/deletemany' : '/todo/' + ids[0] + '/delete';
 		routn.navigateTo(route, ids);
 		
 		showChangeButtons();
@@ -264,7 +264,7 @@ $(function(){
 		var ids = getSelectedIds();
 		if(!ids || !ids.length) return;
 
-		var route = ids.length > 1 ? 'todos/togglemany' : '/todo/' + ids[0] + '/toggle';
+		var route = ids.length > 1 ? '/todos/togglemany' : '/todo/' + ids[0] + '/toggle';
 		routn.navigateTo(route, ids);
 
 		showChangeButtons();
@@ -278,7 +278,7 @@ $(function(){
 	});
 
 	$('#lnkClearSelection').on('click', function(e){
-		document.location.href = '#todos/clear';
+		document.location.href = '#/todos/clear';
 	});	
 
 	// event_listeners_end
