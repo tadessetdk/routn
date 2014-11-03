@@ -298,9 +298,8 @@ $(function(){
 	});
 
 	$('#lnkCompleteAll').on('click', function(e){
-		//will not work, navigates away; use routn.navigateTo('/todos/completeall');
-		//document.location.href = document.location.origin +'/todos/completeall';
-		routn.navigateTo('/todos/completeall', todos);
+		//document.location.href navigates away; use routn.navigateTo('/todos/completeall');		
+		routn.navigateTo('/todos/completeall?t=2', todos);
 	});
 
 	$('#lnkClearSelection').on('click', function(e){

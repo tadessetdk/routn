@@ -112,7 +112,7 @@ var routn = (function(){
 
 	function isIgnoreHistory(url) {
 		var match = parseRoute(url);
-		return match && routesNotSaved[match.route];
+		return match && routesWithoutHistory[match.route];
 	}
 
 	function parseRoute(url){			
@@ -279,7 +279,7 @@ var routn = (function(){
 	function parseIgnoreHistory(route, keepHistory){
 
 		if((typeof keepHistory === 'boolean') && !keepHistory){
-			return (routesNotSaved[route] = true);
+			return (routesWithoutHistory[route] = true);
 		}
 
 		return false;
@@ -288,7 +288,7 @@ var routn = (function(){
 
 	var useHashForRouting = true,
 		registeredRoutes = {}, 
-		routesNotSaved = {};
+		routesWithoutHistory = {};
 
 	return {
 
@@ -296,6 +296,12 @@ var routn = (function(){
 
 			useHashForRouting = useHash == undefined ? true : useHash;
 			
+		},
+
+		navigateAway: function(url){
+
+			document.location.href = url;
+
 		},
 
 		navigateTo: function(url, data){
