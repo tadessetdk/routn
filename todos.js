@@ -204,7 +204,7 @@ $(function(){
 	function addLog(route, ignoreHistory) {
 		console.log(route);
 		$('<div class="log ' + (ignoreHistory ? 'not-saved' : '') + '"/>').html(route)
-			.appendTo($('#logs-container'))[0].scrollIntoView();
+			.prependTo($('#logs-container'));
 		$('#logs-section').fadeIn().css({display: 'inline-block'});
 	}
 
