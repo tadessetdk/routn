@@ -18,8 +18,8 @@ $(function(){
 
 	var todos = [
 		new todo(1, 'Code review', INCOMPLETE),
-		new todo(2, 'TechEd code complete', DONE),
-		new todo(3, 'Release-4.12', INCOMPLETE)
+		new todo(2, 'Deployment verification', DONE),
+		new todo(3, 'Release 1.1.0.2', INCOMPLETE)
 	];
 
 	var sortedByInfo = { name: null, ascending: true };
@@ -188,7 +188,7 @@ $(function(){
 			
 		}],
 
-		["/clear-logs", function(ctx){
+		["/logs/clear", function(ctx){
 
 			addLog(ctx.url);
 			clearLogs();		
