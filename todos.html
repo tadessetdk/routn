@@ -76,6 +76,7 @@
 			margin: 16px;
 			width: 400px;
 			border-radius: 5px;
+			display: inline-block;
 		}
 
 		.section{
@@ -100,6 +101,36 @@
 			padding: 3px 8px;
 		}
 
+		#logs-section{
+			margin: 125px 16px 16px 16px;
+			padding: 8px;
+			border: solid 1px #CCC;
+			font-style: italic;
+			display: none;
+			vertical-align: top;
+		}
+
+		#logs-section .log-actions{
+			margin: 0 8px 8px;
+			text-align: right;
+		}
+
+		#logs-container{
+			max-height: 500px;
+			overflow: auto;
+			width: 250px;
+		}
+
+		#logs-container .log{
+			margin: 4px 8px;
+			padding: 4px 0;
+			border-bottom: dotted 1px #AAA;
+		}
+
+		#logs-container .log.not-saved{
+			background-color: #FFD;
+		}
+
 	</style>
 	<script id='todos-template' type='text/x-handlebars-template'>
 		{{#each todos}}
@@ -121,7 +152,7 @@
 	<table border="0" cellpadding="0" cellspacing="0">
 		<thead>
 			<th><input type='checkbox' id='chkAll'/></th>
-			<th><a href="#todos/sort/1">Name</a></th>
+			<th><a href="#/todos/sort/1">Name</a></th>
 			<th><a href="/todos/sort/2">Status</a></th>
 		</thead>
 		<tbody id='todos-table'>			
@@ -135,6 +166,10 @@
 			<input type='button' id='btnToggleStatus' value='Toggle Status'/>
 		</span>
 	</div>
+</div>
+<div id='logs-section'>
+	<div class='log-actions'><a href='#clear-logs'>Clear logs</a></div>
+	<div id='logs-container'></div>
 </div>
 </body>
 </html>

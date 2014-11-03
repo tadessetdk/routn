@@ -31,13 +31,13 @@ $(function(){
 	routn.register([
 		["*", function(ctx) { 
 
-			console.log(ctx.url, ' - route detected');
+			addLog(ctx.url);
 
 		} ],
 
 		["/todos", function(ctx){
 
-			console.log(ctx.url, ' - route detected');
+			addLog(ctx.url);
 
 			$('#txtTodo').val('');
 			renderTodosView(ctx.data);
@@ -46,7 +46,7 @@ $(function(){
 	
 		["/todo/:id/delete", false, function(ctx){
 
-			console.log(ctx.url, ' - route detected');
+			addLog(ctx.url, true);
 
 			var pos = -1;
 			todos.some(function(t) {
@@ -63,7 +63,7 @@ $(function(){
 
 		["/todos/deletemany", false, function(ctx, next){
 
-			console.log(ctx.url, ' - route detected');
+			addLog(ctx.url, true);
 			
 			ctx.data.forEach(function(id) {
 			
@@ -87,7 +87,7 @@ $(function(){
 
 		["/todos/add", false, function(ctx, next){
 
-			console.log(ctx.url, ' - route detected');
+			addLog(ctx.url, true);
 
 			var val = $('#txtTodo').val().trim();
 
@@ -105,7 +105,7 @@ $(function(){
 
 		["/todo/:id/toggle", function(ctx, next){
 
-			console.log(ctx.url, ' - route detected');
+			addLog(ctx.url);
 
 			var items = todos.filter(function(t) { return t.id == ctx.params.id;});	
 			if(items.length){		
@@ -121,7 +121,7 @@ $(function(){
 
 		["/todos/togglemany", function(ctx, next){
 
-			console.log(ctx.url, ' - route detected');
+			addLog(ctx.url);
 			
 			todos.forEach(function(t) {
 			   if(ctx.data.some(function(id) { return t.id == id }) ){
@@ -137,7 +137,7 @@ $(function(){
 
 		["/todos/sort/:column", function(ctx){
 
-			console.log(ctx.url, ' - route detected');
+			addLog(ctx.url);
 
 			var column = ctx.params.column;
 			var count = -1, key = null;
@@ -167,7 +167,7 @@ $(function(){
 
 		["/todos/completeall", function(ctx, next){
 
-			console.log(ctx.url, ' - route detected');
+			addLog(ctx.url);
 			
 			ctx.data.forEach(function(t){
 				t.status = DONE;
@@ -183,16 +183,36 @@ $(function(){
 
 		["/todos/clear", function(ctx){
 
-			console.log(ctx.url, ' - route detected');
+			addLog(ctx.url);
 			renderTodosView(todos);			
 			
-		}]	
+		}],
+
+		["/clear-logs", function(ctx){
+
+			addLog(ctx.url);
+			clearLogs();		
+			
+		}]
 
 	]);
 	
 	// routing_section_end
 
 	// view_section_begin
+
+	function addLog(route, ignoreHistory) {
+		console.log(route);
+		$('<div class="log ' + (ignoreHistory ? 'not-saved' : '') + '"/>').html(route)
+			.appendTo($('#logs-container'))[0].scrollIntoView();
+		$('#logs-section').fadeIn().css({display: 'inline-block'});
+	}
+
+	function clearLogs(){
+		$('#logs-container').html('');
+		$('#logs-section').fadeOut().css({display: 'none'});
+
+	}
 
 	function updateStatusView(todo){
 		$('#row-' + todo.id).find('td:last-child').html(todo.status)
@@ -210,13 +230,19 @@ $(function(){
 	}
 
 	function showSelectionChangeButtons(){
-		var isChecked = $('tbody :checkbox:checked').length;
-		$('.selection-change-button').css('display', isChecked ? 'inline' : 'none');
+		if($('tbody :checkbox:checked').length){
+			$('.selection-change-button').fadeIn().css('display', 'inline');
+		} else {
+			$('.selection-change-button').fadeOut().css('display', 'none');
+		}
 	}
 
 	function showChangeButtons(){
-		var show = $('tbody :checkbox').length;
-		$('.change-buttons').css('display', show ? 'block' : 'none');
+		if($('tbody :checkbox').length){
+			$('.change-buttons').fadeIn().css('display', 'block');
+		} else {
+			$('.change-buttons').fadeOut().css('display', 'none');
+		}
 	}
 
 	function getSelectedIds(){
