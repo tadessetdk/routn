@@ -31,13 +31,13 @@ $(function(){
 	routn.register([
 		["*", function(ctx) { 
 
-			addLog(ctx.url);
+			addLog(ctx);
 
 		} ],
 
 		["/todos", function(ctx){
 
-			addLog(ctx.url);
+			addLog(ctx);
 
 			$('#txtTodo').val('');
 			renderTodosView(ctx.data);
@@ -46,7 +46,7 @@ $(function(){
 	
 		["/todo/:id/delete", false, function(ctx){
 
-			addLog(ctx.url, true);
+			addLog(ctx, true);
 
 			var pos = -1;
 			todos.some(function(t) {
@@ -63,7 +63,7 @@ $(function(){
 
 		["/todos/deletemany", false, function(ctx, next){
 
-			addLog(ctx.url, true);
+			addLog(ctx, true);
 			
 			ctx.data.forEach(function(id) {
 			
@@ -87,7 +87,7 @@ $(function(){
 
 		["/todos/add", false, function(ctx, next){
 
-			addLog(ctx.url, true);
+			addLog(ctx, true);
 
 			var val = $('#txtTodo').val().trim();
 
@@ -105,7 +105,7 @@ $(function(){
 
 		["/todo/:id/toggle", function(ctx, next){
 
-			addLog(ctx.url);
+			addLog(ctx);
 
 			var items = todos.filter(function(t) { return t.id == ctx.params.id;});	
 			if(items.length){		
@@ -121,7 +121,7 @@ $(function(){
 
 		["/todos/togglemany", function(ctx, next){
 
-			addLog(ctx.url);
+			addLog(ctx);
 			
 			todos.forEach(function(t) {
 			   if(ctx.data.some(function(id) { return t.id == id }) ){
@@ -137,7 +137,7 @@ $(function(){
 
 		["/todos/sort/:column", function(ctx){
 
-			addLog(ctx.url);
+			addLog(ctx);
 
 			var column = ctx.params.column;
 			var count = -1, key = null;
@@ -167,7 +167,7 @@ $(function(){
 
 		["/todos/completeall", function(ctx, next){
 
-			addLog(ctx.url);
+			addLog(ctx);
 			
 			ctx.data.forEach(function(t){
 				t.status = DONE;
@@ -183,14 +183,14 @@ $(function(){
 
 		["/todos/clear", function(ctx){
 
-			addLog(ctx.url);
+			addLog(ctx);
 			renderTodosView(todos);			
 			
 		}],
 
 		["/logs/clear", function(ctx){
 
-			addLog(ctx.url);
+			addLog(ctx);
 			clearLogs();		
 			
 		}]
@@ -201,9 +201,9 @@ $(function(){
 
 	// view_section_begin
 
-	function addLog(route, ignoreHistory) {
-		console.log(route);
-		$('<div class="log ' + (ignoreHistory ? 'not-saved' : '') + '"/>').html(route)
+	function addLog(ctx, ignoreHistory) {
+		console.log(ctx.url);
+		$('<div class="log ' + (ignoreHistory ? 'not-saved' : '') + '"/>').html(ctx.path)
 			.prependTo($('#logs-container'));
 		$('#logs-section').fadeIn().css({display: 'inline-block'});
 	}

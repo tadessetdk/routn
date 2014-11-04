@@ -15,29 +15,57 @@ var routn = (function(){
 	window.onclick = function(e){
 		
 		//intercept relative links and route them locally
-		//do not use document.location for routing instead use routn.navigateTo(url, stateData)
+		//do not use document.location for routing instead use routn.transitionTo()
 
 		var destUrl = e.target ? e.target.href : null;
 		if(destUrl){
 			
-			var path = destUrl.replace(document.location.origin, ''); 
-
 			//IE hash click in the document links does not trigger onhashchange event
-			var hashIndex = path.indexOf('#');	
-			var hasHash =  hashIndex !== -1;
+			var result = getRoutePath(destUrl); 
 			
-			if((isIE() && hasHash)){							
-				path = '/' + path.substring(hashIndex + 1);	
-				navigatePropagate(e, path, true);			
-			} else if(!hasHash) {				
-				navigatePropagate(e, path);	
+			if(result){
+
+				if((isIE() && result.hasHash)){							
+					navigatePropagate(e, destUrl, result.path, true);			
+				} else if(!result.hasHash) {				
+					navigatePropagate(e, destUrl, result.path);	
+				}
+
 			}
 			
 		}
 
 	}
 
-	function navigatePropagate(e, path, propagate){
+	function getRoutePath(url){
+
+		if(!url || !url.trim()) return null;
+
+		var path = url.replace(document.location.origin, ''); 
+		var hashIndex = -1;
+
+		if(useHashForRouting){
+
+			hashIndex = path.indexOf('#');			
+
+			if(hashIndex !== -1){
+				path = path.substring(hashIndex + 1);	
+			}
+
+		}
+
+		var hasHash =  hashIndex !== -1;
+		if(!hasHash){
+			var queryIndex = path.indexOf('?');
+			if(queryIndex !== -1){
+				path = path.substring(0, queryIndex);
+			}
+		}
+
+		return { path: path, hasHash: hasHash };
+	}
+
+	function navigatePropagate(e, url, path, propagate){
 
 		if(/^\/.*$/.test(path)) {
 
@@ -50,7 +78,7 @@ var routn = (function(){
 				if(e.cancelBubble) e.cancelBubble = true;
 			}
 
-			routn.navigateTo(path, e.state);
+			transitionTo(url, path, e.state);
 
 		}
 
@@ -72,8 +100,8 @@ var routn = (function(){
 			
 		}
 
-		var context = new routeContext(path, e.state || {});
-		transitionTo(context);
+		var context = new routeContext(document.location.href, path, e.state || {});
+		transition(context);
 	}
 
 	var route = function(route, parts, handlers){
@@ -87,7 +115,8 @@ var routn = (function(){
 		this.type = type;
 	};
 
-	var routeContext = function(url, data){
+	var routeContext = function(url, path, data){
+		this.path = path;
 		this.url = url;
 		this.data = data;
 		this.params = null;
@@ -96,16 +125,17 @@ var routn = (function(){
 	routeContext.prototype.save = function(data){
 		this.data = data;
 
-		if(!isIgnoreHistory(this.url)){
+		if(!isIgnoreHistory(this.path)){
 			window.history.replaceState(this.data, null, this.url);
 		}
 	};
 
-	routeContext.prototype.create = function(url, data){
+	routeContext.prototype.create = function(url, path, data){
 		this.url = url;
+		this.path = path;
 		this.data = data;
 		
-		if(!isIgnoreHistory(this.url)){
+		if(!isIgnoreHistory(this.path)){
 			window.history.pushState(this.data, null, this.url);
 		}
 	};
@@ -265,9 +295,17 @@ var routn = (function(){
 
 	}	
 
-	function transitionTo(context){
+	function transitionTo(url, path, data){
 
-		var route = parseRoute(context.url);
+		var context = new routeContext();
+		context.create(url, path, data);
+		transition(context);
+
+	}
+
+	function transition(context){
+
+		var route = parseRoute(context.path);
 
 		if(route){
 			context.params = route.params;
@@ -284,7 +322,7 @@ var routn = (function(){
 
 		return false;
 
-	}
+	}	
 
 	var useHashForRouting = true,
 		registeredRoutes = {}, 
@@ -306,9 +344,8 @@ var routn = (function(){
 
 		navigateTo: function(url, data){
 
-			var context = new routeContext();
-			context.create(url, data);
-			transitionTo(context);
+			var path = getRoutePath(url).path;
+			transitionTo(url, path, data);
 
 		},
 
