@@ -28,7 +28,9 @@ $(function(){
 
 	// routing_section_begin
 
-	routn.register(
+	routn
+	.setup({ useHash: true })
+	.register(
 		["*", function(ctx) { 
 
 			addLog(ctx);
@@ -205,12 +207,12 @@ $(function(){
 		console.log(ctx.url);
 		$('<div class="log ' + (ignoreHistory ? 'not-saved' : '') + '"/>').append($('<div/>').html(ctx.url)).append($('<div/>').html(ctx.path))
 			.prependTo($('#logs-container'))[0].scrollIntoView();
-		$('#logs-section').fadeIn().css({display: 'inline-block'});
+		$('#logs-section').slideDown().css({display: 'inline-block'});
 	}
 
 	function clearLogs(){
 		$('#logs-container').html('');
-		$('#logs-section').fadeOut().css({display: 'none'});
+		$('#logs-section').slideUp('slow');
 
 	}
 
@@ -233,7 +235,7 @@ $(function(){
 		if($('tbody :checkbox:checked').length){
 			$('.selection-change-button').fadeIn().css('display', 'inline');
 		} else {
-			$('.selection-change-button').fadeOut().css('display', 'none');
+			$('.selection-change-button').fadeOut();
 		}
 	}
 

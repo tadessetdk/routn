@@ -330,15 +330,18 @@ var routn = (function(){
 
 	return {
 
-		setup: function(useHash) {
+		setup: function(options) {
 
+			var useHash = options.useHash || true;
 			useHashForRouting = useHash == undefined ? true : useHash;
+			return this;
 			
 		},
 
 		navigateAway: function(url){
 
 			document.location.href = url;
+			return this;
 
 		},
 
@@ -346,6 +349,7 @@ var routn = (function(){
 
 			var path = getRoutePath(url).path;
 			transitionTo(url, path, data);
+			return this;
 
 		},
 
@@ -379,6 +383,8 @@ var routn = (function(){
 				);
 
 			}
+
+			return this;
 
 		}	
 
