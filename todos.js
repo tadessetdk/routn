@@ -28,7 +28,7 @@ $(function(){
 
 	// routing_section_begin
 
-	routn.register([
+	routn.register(
 		["*", function(ctx) { 
 
 			addLog(ctx);
@@ -195,7 +195,7 @@ $(function(){
 			
 		}]
 
-	]);
+	);
 	
 	// routing_section_end
 
@@ -203,8 +203,8 @@ $(function(){
 
 	function addLog(ctx, ignoreHistory) {
 		console.log(ctx.url);
-		$('<div class="log ' + (ignoreHistory ? 'not-saved' : '') + '"/>').html(ctx.path)
-			.prependTo($('#logs-container'));
+		$('<div class="log ' + (ignoreHistory ? 'not-saved' : '') + '"/>').append($('<div/>').html(ctx.url)).append($('<div/>').html(ctx.path))
+			.prependTo($('#logs-container'))[0].scrollIntoView();
 		$('#logs-section').fadeIn().css({display: 'inline-block'});
 	}
 
