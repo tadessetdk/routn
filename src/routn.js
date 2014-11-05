@@ -388,6 +388,20 @@ var routn = (function(){
 
 		}	
 
+	return new function(){
+		var _this = this, 
+			dummy, 
+			historySupported = !!(window.history && window.history.pushState && window.history.replaceState && window.onpopstate);
+		
+		if(!historySupported) {
+			dummy = function(){ return _this };
+			console.log("routn works only with browsers that support HTML5 history APIs");			
+		}
+
+		this.setup = historySupported ? setup.bind(this) : dummy;
+		this.navigateAway = historySupported ? navigateAway.bind(this) : dummy;
+		this.navigateTo = historySupported ? navigateTo.bind(this) : dummy;
+		this.register = historySupported ? register.bind(this) : dummy;		
 	};
 
 })();
