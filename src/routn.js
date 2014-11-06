@@ -1,8 +1,8 @@
-//Written by Tadesse D. Feyissa. Oct 28, 2014.
+//Written by Tadesse D. Feyissa.
 
 var routn = (function(){
 
-	"use strict";
+	"use strict";	
 
 	window.onpopstate = function(e){
 		handlePathChange(e);
@@ -237,7 +237,7 @@ var routn = (function(){
 
 	function isValidRoute(newRoute){
 
-		if(!newRoute || !newRoute.trim(' ')){
+		if(!newRoute || !newRoute.trim()){
 			console.log("Empty route is not allowed; use * instead");	
 			return false;			
 		}
@@ -255,14 +255,14 @@ var routn = (function(){
 
 		if(!url) return null;
 
-		var segments = url.split('/').filter(function(s){ return s && s.trim(' ') });
+		var segments = url.split('/').filter(function(s){ return s && s.trim() });
 
 		var len = segments.length;
 		var parts = [];
 
 		for (var i = 0; i < len; i++) {
 
-			var item = segments[i].trim(' ');
+			var item = segments[i].trim();
 			var part = new routePart();
 			part.name = item.replace(':', '').toLowerCase();
 			var isId = !(item.indexOf(':') === -1 && isNaN(item));
@@ -324,69 +324,67 @@ var routn = (function(){
 
 	}	
 
+	function setup(options) {
+
+		var useHash = options.useHash || true;
+		useHashForRouting = useHash == undefined ? true : useHash;
+		return this;
+		
+	}
+
+	function navigateAway (url){
+
+		document.location.href = url;
+		return this;
+
+	}
+
+	function navigateTo(url, data){
+
+		var path = getRoutePath(url).path;
+		transitionTo(url, path, data);
+		return this;
+
+	}
+
+	function register(){
+
+		var routesIn = (arguments && arguments[0] && (arguments[0][0] instanceof Array)) ? arguments[0] : (Array.prototype.slice.apply(arguments));
+
+		if(!routesIn || !routesIn.length){
+			console.log("No routes found");
+			return;
+		}
+
+		var len = routesIn.length;
+	
+		for (var i = 0; i < len; i++) {
+
+			var newRoute = routesIn[i][0];
+
+			if(!isValidRoute(newRoute)) {
+				continue;				
+			}
+
+			registeredRoutes[newRoute] = new route
+			(
+				newRoute, 
+				getUrlParts(newRoute), 
+				getRouteHandlers(
+					routesIn[i], 
+					parseIgnoreHistory(newRoute, routesIn[i][1])
+				)
+			);
+
+		}
+
+		return this;
+
+	}	
+
 	var useHashForRouting = true,
 		registeredRoutes = {}, 
 		routesWithoutHistory = {};
-
-	return {
-
-		setup: function(options) {
-
-			var useHash = options.useHash || true;
-			useHashForRouting = useHash == undefined ? true : useHash;
-			return this;
-			
-		},
-
-		navigateAway: function(url){
-
-			document.location.href = url;
-			return this;
-
-		},
-
-		navigateTo: function(url, data){
-
-			var path = getRoutePath(url).path;
-			transitionTo(url, path, data);
-			return this;
-
-		},
-
-		register: function(){
-
-			var routesIn = (arguments && arguments[0] && (arguments[0][0] instanceof Array)) ? arguments[0] : (Array.prototype.slice.apply(arguments));
-
-			if(!routesIn || !routesIn.length){
-				console.log("No routes found");
-				return;
-			}
-
-			var len = routesIn.length;
-		
-			for (var i = 0; i < len; i++) {
-
-				var newRoute = routesIn[i][0];
-
-				if(!isValidRoute(newRoute)) {
-					continue;				
-				}
-
-				registeredRoutes[newRoute] = new route
-				(
-					newRoute, 
-					getUrlParts(newRoute), 
-					getRouteHandlers(
-						routesIn[i], 
-						parseIgnoreHistory(newRoute, routesIn[i][1])
-					)
-				);
-
-			}
-
-			return this;
-
-		}	
 
 	return new function(){
 		var _this = this, 

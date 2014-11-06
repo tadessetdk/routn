@@ -1,39 +1,33 @@
-//Written by Tadesse D. Feyissa. Oct 28, 2014.
-
-//======================
-//		test cases
-//======================
-
 (function(){
 
 	routn.register([
 		["*", function(ctx) { 
-			console.log(ctx.url,  ' - route detected');
+			console.log('%s - route detected', ctx.url);
 		} ],
 
 		["/", function(ctx){
-			console.log(ctx.url,  ' - route detected');
+			console.log('%s - route detected', ctx.url);
 		} ],
 
 		["/products", function(ctx){
-			console.log(ctx.url,  ' - route detected');
+			console.log('%s - route detected', ctx.url);
 		} ],
 
 		["/product/:id", function(ctx){
-			console.log(ctx.url,  ' - route detected');
+			console.log('%s - route detected', ctx.url);
 		} ],
 
 		["/product/:id/*", function(ctx){
-			console.log(ctx.url,  ' - route detected');
+			console.log('%s - route detected', ctx.url);
 		} ],
 
 		["/product/:id/edit", false /* do not add to history, good for update operations*/, function(ctx){
-			console.log(ctx.url,  ' - route detected');
+			console.log('%s - route detected', ctx.url);
 		} ],
 
 		["/product/:id/save", false /* do not add to history */, function(ctx, next){
 
-			console.log(ctx.url,  ' - route detected');
+			console.log('%s - route detected', ctx.url);
 			var d = products[ctx.params.id];
 			d.rank = 7;
 			ctx.save(d);
@@ -46,7 +40,7 @@
 
 		["/product/add", false /* do not add to history */, function(ctx, next){
 
-			console.log(ctx.url,  ' - route detected');
+			console.log('%s - route detected', ctx.url);
 			//console.log("add view displayed");
 			next();
 			
@@ -59,15 +53,15 @@
 		}],		
 
 		["/product/*", function(ctx){
-			console.log(ctx.url,  ' - route detected')
+			console.log('%s - route detected', ctx.url)
 		}],		
 
 		["/products/#sort/asc", function(ctx){
-			console.log(ctx.url,  ' - route detected')
+			console.log('%s - route detected', ctx.url)
 		}],		
 
 		["/products#merge", function(ctx){
-			console.log(ctx.url,  ' - route detected')
+			console.log('%s - route detected', ctx.url)
 		}]	
 	]);
 
