@@ -4,9 +4,11 @@ A simple JavaScript routing library based on History APIs
 
 Features
 ---------
-- routing based on relative path or hash (optional) 
+- routes based on hash or relative path 
+	- hash enabled by default
+	- if disabled, relative path will be used 
 - intercepts link clicks on the document and route them
-- save route context data in history
+- update route context data in history
 - option to skip history of mutating actions
 - chained route handlers 
 - external navigation
@@ -38,8 +40,8 @@ Usage
 		} ]
 	);
 ```
-####navigate using javascript 
-	- use **routn.navigateTo(url, data)** to go to a route
+####manual navigation
+	- use routn.navigateTo(url, data) to go to a route
 	- the data will be passed to the route handlers
 
 ```javascript 
@@ -52,9 +54,9 @@ Usage
 	);
 ```
 
-####ignoring history for actions that modify your data model
-	- pass **false** boolean value as second argument when registering the route
-	- helpful if you don't want to add actions such as add, delete... to history	
+####ignoring history for data mutating actions
+	- pass false as second argument to register()
+	- useful to keep actions such as add, delete... out of history
 
 ```javascript 
 	routn.register(		
@@ -66,7 +68,7 @@ Usage
 ```
 
 ####saving context data
-	- this uses **replaceState** history api 
+	- this uses replaceState() history api 
 
 ```javascript 
 	routn.register(		
@@ -77,21 +79,22 @@ Usage
 	);
 ```
 
-####opt-out of hash (use only relative paths). it is enabled by default.
+####disable hash and use relative path instead
 ```javascript 
 	routn.setup({ useHash: false })
 ```
 
-####chainable route handlers
+####chaining route handlers
 ```javascript 
 	routn.register(		
 		["/todo/:id/delete", false, function(context, next){
 			var id == context.params.id;
-			//delete todo using id
-			next();
+			//your code here
+			next(); // will invoke the next handler below
+			//...
 		}, function(context){
-			// this will called when next() is executed.
-			// render your view here...
+			// called when next() is executed in a preceding handler
+			//...
 		} ]
 	);
 ```
