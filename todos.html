@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="libs/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="libs/handlebars-v2.0.0.js"></script>
+	<script type="text/javascript" src="src/routn.js"></script>
+	<script type="text/javascript" src="todos.js"></script>
+	<style type="text/css">
+
+		body, input{
+			font-family: "wf_SegoeUILight","wf_SegoeUI","Segoe UI Light","Segoe WP Light","Segoe UI","Segoe","Segoe WP","Tahoma","Verdana","Arial","sans-serif";
+			font-size:13px;
+		}
+
+		a{
+			color: #336699;
+			text-decoration: none;
+			font-weight: 500;
+		}
+
+		a:hover{
+			color: #60A2F7;
+			text-decoration: none;
+		}
+
+		table{
+			width: 100%;
+		}
+
+		th, td {
+			padding: 4px 8px;
+			border: solid 1px #EEE;
+			text-align: left;
+			font-size:1em;			
+		}
+
+		td:nth-child(2){
+			font-weight: 500;
+		}
+
+		tr.highlight-row td{
+			background-color: #FFC;
+		}
+
+		td:first-child, th:first-child {
+			text-align: center;
+			font-weight: normal;
+		}
+
+		.add-section{
+			border-top-left-radius: 5px;	
+			border-top-right-radius: 5px;			
+		}
+
+		.change-buttons{
+			text-align: right;
+			border-bottom-left-radius: 5px;			
+			border-bottom-right-radius: 5px;			
+		}
+
+		.change-buttons a{
+			margin:0 2px;			
+		}
+
+		.change-buttons span{
+			padding: 0 4px;	
+		}
+
+		span.selection-change-button{
+			display: none;			
+			border-left: solid 1px #CCC;		
+		}
+
+		.todos-container{
+			font-size: 1em;
+			margin: 16px;
+			width: 400px;
+			border-radius: 5px;
+			display: inline-block;
+		}
+
+		.section{
+			padding: 16px 8px;
+			border: solid 1px #DDD;
+			background-color: #FDFDFD;
+		}
+
+		.add-section{
+			background-color: #EEE;
+		}
+
+		.add-section input[type='text'] {
+			margin-left: 8px;
+			width: 78%;
+			padding: 4px 8px;
+			border-radius: 3px;
+			border: solid 1px #7DC0F3;
+		}
+
+		.add-section input[type='button'] {
+			padding: 3px 8px;
+		}
+
+		#logs-section{
+			margin: 67px 16px 16px 16px;
+			padding: 8px;
+			border: dotted 1px #DDD;
+			font-style: italic;
+			display: none;
+			vertical-align: top;
+			background-color: #000;
+			color: #FFF;
+		}
+
+		#logs-section .log-actions{
+			margin: 0 8px;
+			text-align: right;
+			display: inline-block;
+			font-style: normal;
+		}
+
+		#logs-section .log-actions.links{
+			width: 200px;
+		}
+
+		#logs-container{
+			padding: 0 16px;
+			max-height: 600px;
+			overflow: auto;
+			width: 350px;
+		}
+
+		#logs-container .log{
+			margin: 4px 8px;
+			padding: 4px 0;
+			border-top: dotted 1px #AAA;
+		}
+
+		#logs-container .log.not-saved::before{
+			content: "**";
+			color: #0F0;
+		}
+
+		#logs-container .log div:nth-child(2){
+			color: #F00;
+		}
+
+		::-webkit-scrollbar {
+		    width: 1em;
+		}
+
+		::-webkit-scrollbar-track {
+		    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+		    -webkit-border-radius: 10px;
+		    border-radius: 10px;
+		}
+		 
+		::-webkit-scrollbar-thumb {
+		    -webkit-border-radius: 10px;
+		    border-radius: 10px;
+		    background: rgba(200,200,200,0.6); 
+		    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+		}
+
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(180,180,180,0.4); 
+		}
+
+	</style>
+	<script id='todos-template' type='text/x-handlebars-template'>
+		{{#each todos}}
+			<tr id='row-{{id}}'>
+				<td><input type='checkbox'/></td>
+				<td>{{name}}</td>
+				<td>{{status}}</td>
+			</tr>
+		{{/each}}
+	</script>
+</head>
+<body>
+<div class="todos-container"> 
+	<h3>TODO List - built using <u>routn.js</u></h3>
+	<div class='section add-section'>
+		<input type='text' id='txtTodo' value='' placeholder='New TODO here ...' size='30'/>
+		<input type='button' id='btnAdd' disabled="disabled" value='Add'/>
+	</div>
+	<table border="0" cellpadding="0" cellspacing="0">
+		<thead>
+			<th><input type='checkbox' id='chkAll'/></th>
+			<th><a href="#/todos/sort/1">Todo</a></th>
+			<th><a href="/todos/sort/2">Status</a></th>
+		</thead>
+		<tbody id='todos-table'>			
+		</tbody>
+	</table>
+	<div class="section change-buttons">
+		<span><a id='lnkCompleteAll' href="javascript:void(0)">Complete All</a></span>
+		<span class='selection-change-button'> 
+			<a id='lnkClearSelection' href="javascript:void(0)">Clear</a>
+			<input type='button' id='btnDelete' value='Delete'/>
+			<input type='button' id='btnToggleStatus' value='Toggle Status'/>
+		</span>
+	</div>
+</div>
+<div id='logs-section'>
+	<div class='log-actions'><h3>Routing results</h3></div>
+	<div class='log-actions links'><a href='#/logs/clear'>Clear logs</a></div>
+	<div id='logs-container'></div>
+</div>
+</body>
+</html>
