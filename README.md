@@ -70,13 +70,15 @@ Usage
 ```
 
 ####saving context data
+	- use context.save(newData)
 	- this uses replaceState() history api 
 
 ```javascript 
 	routn.register(		
 		["/todo/:id/save", false, function(context){
-			context.data = mynewdata;
-			context.save();
+			...
+			context.save(mynewdata);
+			...
 		} ]
 	);
 ```
@@ -94,7 +96,7 @@ Usage
 			//your code here
 			next(); // will invoke the next handler below
 			//...
-		}, function(context){
+		}, function(context, next){
 			// called when next() is executed in a preceding handler
 			//...
 		} ]
