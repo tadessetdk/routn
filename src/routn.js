@@ -39,7 +39,7 @@ var routn = (function(){
 
 	function getRoutePath(url){
 
-		if(!url || !url.trim()) return null;
+		if(isEmpty(url)) return null; 
 
 		var path = url.replace(document.location.origin, ''); 
 		var hashIndex = -1;
@@ -237,7 +237,7 @@ var routn = (function(){
 
 	function isValidRoute(newRoute){
 
-		if(!newRoute || !newRoute.trim()){
+		if(isEmpty(newRoute)){
 			console.log("Empty route is not allowed; use * instead");	
 			return false;			
 		}
@@ -255,7 +255,7 @@ var routn = (function(){
 
 		if(!url) return null;
 
-		var segments = url.split('/').filter(function(s){ return s && s.trim() });
+		var segments = url.split('/').filter(function(s){ return !isEmpty(s) });
 
 		var len = segments.length;
 		var parts = [];
@@ -324,6 +324,10 @@ var routn = (function(){
 
 	}	
 
+	function isEmpty(input){
+		return !(input && input.trim());
+	}
+
 	function setup(options) {
 
 		var useHash = options.useHash || true;
@@ -334,6 +338,8 @@ var routn = (function(){
 
 	function navigateAway (url){
 
+		if(isEmpty(url)) return; 
+
 		document.location.href = url;
 		return this;
 
@@ -341,8 +347,15 @@ var routn = (function(){
 
 	function navigateTo(url, data){
 
+		if(isEmpty(url)) return; 
+
+		if(useHashForRouting && url.charAt(0) !== '#'){
+			url = '#' + url;
+		} 
+
 		var path = getRoutePath(url).path;
 		transitionTo(url, path, data);
+
 		return this;
 
 	}
@@ -386,20 +399,17 @@ var routn = (function(){
 		registeredRoutes = {}, 
 		routesWithoutHistory = {};
 
-	return new function(){
-		var _this = this, 
-			dummy, 
-			historySupported = !!(window.history && window.history.pushState && window.history.replaceState && window.onpopstate);
-		
-		if(!historySupported) {
-			dummy = function(){ return _this };
+	return new function(){		
+		if(!(window.history && window.history.pushState && window.history.replaceState && window.onpopstate)){
+			var _this = this;
+			this.setup = this.navigateAway = this.navigateTo = this.register = function(){ return _this };
 			console.log("routn works only with browsers that support HTML5 history APIs");			
+		} else {
+			this.setup = setup.bind(this);
+			this.navigateAway = navigateAway.bind(this);
+			this.navigateTo = navigateTo.bind(this);
+			this.register = register.bind(this);		
 		}
-
-		this.setup = historySupported ? setup.bind(this) : dummy;
-		this.navigateAway = historySupported ? navigateAway.bind(this) : dummy;
-		this.navigateTo = historySupported ? navigateTo.bind(this) : dummy;
-		this.register = historySupported ? register.bind(this) : dummy;		
 	};
 
 })();
