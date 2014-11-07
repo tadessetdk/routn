@@ -154,7 +154,7 @@ var routn = (function(){
 
 	function matchRoute(url){
 
-		if(!url) return null;
+		if(isEmpty(url)) return null;
 
 		//get non-empty segments
 		var parts = getUrlParts(url);
@@ -253,7 +253,7 @@ var routn = (function(){
 
 	function getUrlParts(url){
 
-		if(!url) return null;
+		if(isEmpty(url)) return null;
 
 		var segments = url.split('/').filter(function(s){ return !isEmpty(s) });
 

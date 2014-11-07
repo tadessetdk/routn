@@ -13,7 +13,9 @@ Features
 - chained route handlers 
 - external navigation
 
-See [TODO](todos.js) example for more details.
+See [TODO](todos.js) for more sample code, and
+
+[TODO List](http://tadessetdk.github.io/routn/todos.html) in action.
 
 Dependencies
 ------------
@@ -35,7 +37,7 @@ Usage
 		} ],
 	
 		["/todo/:id/delete", false, function(context){
-			var id == context.params.id;
+			var id = context.params.id;
 			//delete todo using id
 		} ]
 	);
@@ -61,7 +63,7 @@ Usage
 ```javascript 
 	routn.register(		
 		["/todo/:id/delete", false, function(context){
-			var id == context.params.id;
+			var id = context.params.id;
 			//delete todo using id
 		} ]
 	);
@@ -88,7 +90,7 @@ Usage
 ```javascript 
 	routn.register(		
 		["/todo/:id/delete", false, function(context, next){
-			var id == context.params.id;
+			var id = context.params.id;
 			//your code here
 			next(); // will invoke the next handler below
 			//...
