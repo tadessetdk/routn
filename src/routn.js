@@ -4,16 +4,25 @@ var routn = (function(){
 
 	"use strict";	
 
-	window.onpopstate = function(e){
+	function on(target, eventName, handler){
+		eventName = target.addEventListener ? eventName : ('on' + eventName);
+		(target.addEventListener || target.attachEvent)(eventName, handler);
+	}
+
+	function off(){
+		eventName = target.removeEventListener ? eventName : ('on' + eventName);
+		(target.removeEventListener || target.detachEvent)(eventName, handler);
+	}
+
+	function handlePopState(e){
 		handlePathChange(e);
 	}
 
-	window.onhashchange = function(e){
+	function handleHashChange(e){
 		if(isIE()) handlePathChange(e);
 	}
 
-	window.onclick = function(e){
-		
+	function handleClick(e){
 		//intercept relative links and route them locally
 		//do not use document.location for routing instead use routn.transitionTo()
 
@@ -34,8 +43,11 @@ var routn = (function(){
 			}
 			
 		}
-
 	}
+
+	on(window, 'popstate', handlePopState);
+	on(window, 'hashchange',handleHashChange);
+	on(window, 'click', handleClick);
 
 	function getRoutePath(url){
 
@@ -454,20 +466,30 @@ var routn = (function(){
 
 	}	
 
+	function dispose(){
+		registeredRoutes = null;
+		routesWithoutHistory = null;
+		off(window, 'popstate', handlePopState);
+		off(window, 'hashchange',handleHashChange);
+		off(window, 'click', handleClick);
+		return this;
+	}
+
 	var useHashForRouting = true,
 		registeredRoutes = {}, 
 		routesWithoutHistory = {};
 
 	return new function(){		
-		if(!(window.history && window.history.pushState && window.history.replaceState && window.onpopstate)){
+		if(!(window.history && window.history.pushState && window.history.replaceState)){
 			var _this = this;
-			this.setup = this.navigateAway = this.navigateTo = this.register = function(){ return _this };
+			this.setup = this.navigateAway = this.navigateTo = this.register = this.dispose = function(){ return _this };
 			console.log("routn works only with browsers that support HTML5 history APIs");			
 		} else {
 			this.setup = setup.bind(this);
 			this.navigateAway = navigateAway.bind(this);
 			this.navigateTo = navigateTo.bind(this);
-			this.register = register.bind(this);		
+			this.register = register.bind(this);
+			this.dispose = dispose.bind(this);		
 		}
 	};
 
