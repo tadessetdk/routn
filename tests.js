@@ -1,36 +1,31 @@
 (function(){
 
 	routn.register([
-		["*", function(ctx) { 
-			console.log('%s - route detected', ctx.url);
-		} ],
+		["*", log ],
 
-		["/", function(ctx){
-			console.log('%s - route detected', ctx.url);
-		} ],
+		["/", log],
 
-		["/products", function(ctx){
-			console.log('%s - route detected', ctx.url);
-		} ],
+		["/products", log ],
 
-		["/product/:id", function(ctx){
-			console.log('%s - route detected', ctx.url);
-		} ],
+		["/product/:id", log ],
 
-		["/product/:id/*", function(ctx){
-			console.log('%s - route detected', ctx.url);
-		} ],
+		["/product/:id/*", log ],
 
-		["/product/:id/edit", false /* do not add to history, good for update operations*/, function(ctx){
-			console.log('%s - route detected', ctx.url);
-		} ],
+		["/product/:id/edit", { id: /\d+/ }, false /* do not add to history, good for update operations*/, log ],
 
-		["/product/:id/save", false /* do not add to history */, function(ctx, next){
+		["/product/:id/edit/:history_id/history", { id: /\d+/, history_id: /^[a-z0-9]+$/i }, false /* do not add to history, good for update operations*/, log ],
 
-			console.log('%s - route detected', ctx.url);
+		["/product/:id/save", false /* do not add to history */, function(ctx, route, next){
+
+			log(ctx, route);
+
 			var d = products[ctx.params.id];
-			d.rank = 7;
-			ctx.save(d);
+			
+			if(d){
+				d.rank = 7;
+				ctx.save(d);
+			}
+
 			next();
 
 		}, function(ctx){
@@ -38,10 +33,11 @@
 			//console.log("context updated", ctx.data);
 		}],	
 
-		["/product/add", false /* do not add to history */, function(ctx, next){
+		["/products/add", false /* do not add to history */, function(ctx, route, next){
 
-			console.log('%s - route detected', ctx.url);
+			log(ctx, route);
 			//console.log("add view displayed");
+
 			next();
 			
 		}, function(ctx){
@@ -52,18 +48,18 @@
 
 		}],		
 
-		["/product/*", function(ctx){
-			console.log('%s - route detected', ctx.url)
-		}],		
+		["/products/*", log ],	
 
-		["/products/#sort/asc", function(ctx){
-			console.log('%s - route detected', ctx.url)
-		}],		
+		["/product/*", log ],		
 
-		["/products#merge", function(ctx){
-			console.log('%s - route detected', ctx.url)
-		}]	
+		["/products/#sort/asc", log ],		
+
+		["/products#merge", log ]	
 	]);
+
+	function log(ctx, route, next){
+		console.log('%s - routed to - %s', ctx.url, route);
+	}
 
     var products = [
     				{ id: 1, cost: 34.9, rank: 6, timestamp: new Date() },
@@ -74,13 +70,21 @@
 
 	routn.navigateTo('/products', products);
 	routn.navigateTo('/product/3/edit', products);
+	routn.navigateTo('/product/scott/edit', products);
+	routn.navigateTo('/product/3/edit/2/history', products);
+	routn.navigateTo('/product/sam/edit/2/history', products);
+	routn.navigateTo('/product/3/edit/burg/history', products);
+	routn.navigateTo('/product/joe/edit/black/history', products);
 	routn.navigateTo('/product/5', products);
+	routn.navigateTo('/products/add');
 	routn.navigateTo('/product/add');
-	routn.navigateTo('/product/add/x');
-	routn.navigateTo('/product/added/x');
+	routn.navigateTo('/products/add/x');
+	routn.navigateTo('/products/added/x');
 	routn.navigateTo('/products/add/x');
 	routn.navigateTo('/product/2/save');
-	routn.navigateTo('/products/#/sort/asc');
-	routn.navigateTo('/products/#/merge');
+	routn.navigateTo('/product/john/save');
+	routn.navigateTo('/products/sort/asc');
+	routn.navigateTo('/products/merge');
+	routn.navigateTo('#products/add');
 
 })();

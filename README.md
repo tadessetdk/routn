@@ -42,19 +42,6 @@ Usage
 		} ]
 	);
 ```
-####manual navigation
-	- use routn.navigateTo(url, data) to go to a route
-	- the data will be passed to the route handlers
-
-```javascript 
-	routn.navigateTo('/todos', todos);	
-	...
-	routn.register(		
-		["/todos", function(context){
-			var todos = context.data;
-		} ]
-	);
-```
 
 ####ignoring history for data mutating actions
 	- pass false as second argument to register()
@@ -65,6 +52,28 @@ Usage
 		["/todo/:id/delete", false, function(context){
 			var id = context.params.id;
 			//delete todo using id
+		} ]
+	);
+```
+
+####constraining route parameters with Regex
+	- parametes are treated as string by default
+	- use regex if you need to constraint them
+
+```javascript 
+	routn.register(		
+		["/todo/:id/delete", false, { id: /\d+/ },  function(context){
+			var id = context.params.id;
+			//delete todo using id
+		} ],
+
+		["/todo/:id/delete/:history_id/history", false, 
+				{ id: /\d+/, history_id: /^[a-z0-9]+$/i  },  function(context){
+
+			var id = context.params.id;
+			var historyId = context.params.history_id;
+			....
+
 		} ]
 	);
 ```
@@ -99,6 +108,20 @@ Usage
 		}, function(context, next){
 			// called when next() is executed in a preceding handler
 			//...
+		} ]
+	);
+```
+
+####manual navigation
+	- use routn.navigateTo(url, data) to go to a route
+	- the data will be passed to the route handlers
+
+```javascript 
+	routn.navigateTo('/todos', todos);	
+	...
+	routn.register(		
+		["/todos", function(context){
+			var todos = context.data;
 		} ]
 	);
 ```
