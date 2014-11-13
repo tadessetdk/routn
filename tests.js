@@ -26,11 +26,13 @@
 				ctx.save(d);
 			}
 
-			next();
+			//async operation: other routes would finish before next is invoked.
+			window.setTimeout(function(){
+				next();
+			}, 100);
 
 		}, function(ctx){
-			//console.log('/product/:id/save - route detected');
-			//console.log("context updated", ctx.data);
+			console.log("%s - context updated", ctx.url);
 		}],	
 
 		["/products/add", false /* do not add to history */, function(ctx, route, next){
@@ -87,4 +89,8 @@
 	routn.navigateTo('/products/merge');
 	routn.navigateTo('#products/add');
 
+	window.onbeforeunload = function(){
+		routn.dispose();
+		window.onbeforeunload = null;
+	}
 })();

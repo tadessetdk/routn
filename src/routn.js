@@ -9,7 +9,7 @@ var routn = (function(){
 		(target.addEventListener || target.attachEvent)(eventName, handler);
 	}
 
-	function off(){
+	function off(target, eventName, handler){
 		eventName = target.removeEventListener ? eventName : ('on' + eventName);
 		(target.removeEventListener || target.detachEvent)(eventName, handler);
 	}
@@ -347,45 +347,33 @@ var routn = (function(){
 
 	}	
 
-	function getRegisterArgs(routeInfo){
-		
-		var keepHistory = true, constraint;
+	function parseRegisterArgs(argIn, result){
+
+		var argType = typeof(argIn);
+
+		if(argType === 'object'){
+			result.constraint = argIn;
+		} else if(argType === 'boolean'){
+			result.keepHistory = argIn;
+		}
+
+	}
+
+	function getRegisterArgs(routeInfo){		
+
+		var result = { keepHistory: true, constraint: null };
 
 		if(!!routeInfo){
 
-			var arg1 = routeInfo[1],
-				arg1Type = typeof(arg1);
-
-			if(arg1Type === 'object'){
-
-				constraint = arg1;
-
-			} else if(arg1Type === 'boolean'){
-
-				keepHistory = arg1;
-
-			}
+			parseRegisterArgs(routeInfo[1], result);
 
 			if(routeInfo.length > 2){
-
-				var arg2 = routeInfo[2],
-					arg2Type = typeof(arg2);
-
-				if(arg2Type === 'object') {
-
-					constraint = arg2;
-
-				} else if(arg2Type === 'boolean'){
-
-					keepHistory = arg2; 
-
-				}
-
-			}
+		 		parseRegisterArgs(routeInfo[2], result);
+		 	}			
 
 		}
 
-		return  { keepHistory: keepHistory, constraint: constraint };
+		return result;
 
 	}
 
@@ -481,15 +469,19 @@ var routn = (function(){
 
 	return new function(){		
 		if(!(window.history && window.history.pushState && window.history.replaceState)){
+
 			var _this = this;
 			this.setup = this.navigateAway = this.navigateTo = this.register = this.dispose = function(){ return _this };
-			console.log("routn works only with browsers that support HTML5 history APIs");			
+			console.log("routn works only with browsers that support HTML5 history APIs");	
+
 		} else {
+
 			this.setup = setup.bind(this);
 			this.navigateAway = navigateAway.bind(this);
 			this.navigateTo = navigateTo.bind(this);
 			this.register = register.bind(this);
 			this.dispose = dispose.bind(this);		
+
 		}
 	};
 
