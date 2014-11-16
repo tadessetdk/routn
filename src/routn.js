@@ -4,16 +4,25 @@ var routn = (function(){
 
 	"use strict";	
 
-	window.onpopstate = function(e){
+	function on(target, eventName, handler){
+		eventName = target.addEventListener ? eventName : ('on' + eventName);
+		(target.addEventListener || target.attachEvent)(eventName, handler);
+	}
+
+	function off(target, eventName, handler){
+		eventName = target.removeEventListener ? eventName : ('on' + eventName);
+		(target.removeEventListener || target.detachEvent)(eventName, handler);
+	}
+
+	function handlePopState(e){
 		handlePathChange(e);
 	}
 
-	window.onhashchange = function(e){
+	function handleHashChange(e){
 		if(isIE()) handlePathChange(e);
 	}
 
-	window.onclick = function(e){
-		
+	function handleClick(e){
 		//intercept relative links and route them locally
 		//do not use document.location for routing instead use routn.transitionTo()
 
@@ -34,8 +43,11 @@ var routn = (function(){
 			}
 			
 		}
-
 	}
+
+	on(window, 'popstate', handlePopState);
+	on(window, 'hashchange',handleHashChange);
+	on(window, 'click', handleClick);
 
 	function getRoutePath(url){
 
@@ -110,9 +122,10 @@ var routn = (function(){
 		 this.handlers = handlers;
 	};
 
-	var routePart = function(name, type){
+	var routePart = function(name, type, constraint){
 		this.name = name;
 		this.type = type;
+		this.constraint = constraint;
 	};
 
 	var routeContext = function(url, path, data){
@@ -193,18 +206,16 @@ var routn = (function(){
 		
 		for (var i = 0; i < len; i++) {
 
-			var itemsParts = matches[i].parts;
-			var partsLen = itemsParts.length;
+			var routeParts = matches[i].parts;
+			var partsLen = routeParts.length;
 
 			for (var j = 0; j < partsLen; j++) {
 
-				var item = itemsParts[j];
+				var part = routeParts[j];
 
-				if((item.type === 'path' && item.name !== searchParts[j].name) || 
-					(searchParts[j].type === 'path' && item.type === 'id')){
-
+				if((part.type === 'path' && part.name !== searchParts[j].name) 
+					|| failConstraint(part, searchParts[j])){
 					break;
-
 				}
 
 			}
@@ -215,6 +226,13 @@ var routn = (function(){
 		}
 
 		return null;
+	}
+
+	function failConstraint(routePart, searchPart){
+		return routePart.type === 'id' && 
+				routePart.constraint && 
+				routePart.constraint[routePart.name] && 
+				!routePart.constraint[routePart.name].test(searchPart.name);
 	}
 
 	function getMatchInfo(match, searchParts){
@@ -251,7 +269,7 @@ var routn = (function(){
 
 	}
 
-	function getUrlParts(url){
+	function getUrlParts(url, constraint){
 
 		if(isEmpty(url)) return null;
 
@@ -265,8 +283,9 @@ var routn = (function(){
 			var item = segments[i].trim();
 			var part = new routePart();
 			part.name = item.replace(':', '').toLowerCase();
-			var isId = !(item.indexOf(':') === -1 && isNaN(item));
+			var isId = item.indexOf(':') !== -1;
 			part.type = isId ? 'id' : 'path';
+			part.constraint = constraint;
 			parts.push(part);
 
 		}
@@ -274,21 +293,9 @@ var routn = (function(){
 		return parts;
 
 	}
-
-	function executeHandler(handlers, context, index){
-
-		if(!handlers || index >= handlers.length) return;
-
-		handlers[index++].call(null, context, function(){
-			executeHandler(handlers, context, index);
-		}); 
-
-	}
 	
-	function getRouteHandlers(handlers, ignoreHistory){
-
-		var startIndex = ignoreHistory ? 1 : 0;
-
+	function getRouteHandlers(handlers, startIndex){
+		
 		return handlers.filter(function(hnd, i) { 
 			return (i > startIndex) && (typeof(hnd) === 'function')
 		});
@@ -309,20 +316,66 @@ var routn = (function(){
 
 		if(route){
 			context.params = route.params;
-			executeHandler(route.handlers, context, 0);
+			executeHandler(route.handlers, context, route.route, 0);
 		}
 
 	}
 
-	function parseIgnoreHistory(route, keepHistory){
+	function executeHandler(handlers, context, route, index){
 
-		if((typeof keepHistory === 'boolean') && !keepHistory){
-			return (routesWithoutHistory[route] = true);
+		if(!handlers || index >= handlers.length) return;
+
+		var args = [context, function(){
+			executeHandler(handlers, context, route, index);
+		}];
+
+		var handler = handlers[index++];
+
+		if(handler.length > 2){
+			args.splice(1, 0, route);
 		}
 
-		return false;
+		handler.apply(null, args); 
+
+	}
+
+	function setIgnoreHistory(route, keepHistory){
+
+		if(!keepHistory){
+			routesWithoutHistory[route] = true;
+		}
 
 	}	
+
+	function parseRegisterArgs(argIn, result){
+
+		var argType = typeof(argIn);
+
+		if(argType === 'object'){
+			result.constraint = argIn;
+		} else if(argType === 'boolean'){
+			result.keepHistory = argIn;
+		}
+
+	}
+
+	function getRegisterArgs(routeInfo){		
+
+		var result = { keepHistory: true, constraint: null };
+
+		if(!!routeInfo){
+
+			parseRegisterArgs(routeInfo[1], result);
+
+			if(routeInfo.length > 2){
+		 		parseRegisterArgs(routeInfo[2], result);
+		 	}			
+
+		}
+
+		return result;
+
+	}
 
 	function isEmpty(input){
 		return !(input && input.trim());
@@ -362,7 +415,9 @@ var routn = (function(){
 
 	function register(){
 
-		var routesIn = (arguments && arguments[0] && (arguments[0][0] instanceof Array)) ? arguments[0] : (Array.prototype.slice.apply(arguments));
+		var routesIn = (arguments && arguments[0] && (arguments[0][0] instanceof Array)) 
+						? arguments[0] 
+						: (Array.prototype.slice.apply(arguments));
 
 		if(!routesIn || !routesIn.length){
 			console.log("No routes found");
@@ -373,20 +428,24 @@ var routn = (function(){
 	
 		for (var i = 0; i < len; i++) {
 
-			var newRoute = routesIn[i][0];
+			var currentRoute = routesIn[i];
+			var newRoute = currentRoute[0];
 
 			if(!isValidRoute(newRoute)) {
 				continue;				
 			}
 
+			var args = getRegisterArgs(currentRoute);
+			setIgnoreHistory(newRoute, args.keepHistory);
+
+			var index = -1;
+			while((index < currentRoute.length - 1) && (typeof currentRoute[++index]) !== 'function');
+
 			registeredRoutes[newRoute] = new route
 			(
 				newRoute, 
-				getUrlParts(newRoute), 
-				getRouteHandlers(
-					routesIn[i], 
-					parseIgnoreHistory(newRoute, routesIn[i][1])
-				)
+				getUrlParts(newRoute, args.constraint), 
+				getRouteHandlers(currentRoute, index - 1)
 			);
 
 		}
@@ -395,20 +454,34 @@ var routn = (function(){
 
 	}	
 
+	function dispose(){
+		registeredRoutes = null;
+		routesWithoutHistory = null;
+		off(window, 'popstate', handlePopState);
+		off(window, 'hashchange',handleHashChange);
+		off(window, 'click', handleClick);
+		return this;
+	}
+
 	var useHashForRouting = true,
 		registeredRoutes = {}, 
 		routesWithoutHistory = {};
 
 	return new function(){		
-		if(!(window.history && window.history.pushState && window.history.replaceState && window.onpopstate)){
+		if(!(window.history && window.history.pushState && window.history.replaceState)){
+
 			var _this = this;
-			this.setup = this.navigateAway = this.navigateTo = this.register = function(){ return _this };
-			console.log("routn works only with browsers that support HTML5 history APIs");			
+			this.setup = this.navigateAway = this.navigateTo = this.register = this.dispose = function(){ return _this };
+			console.log("routn works only with browsers that support HTML5 history APIs");	
+
 		} else {
+
 			this.setup = setup.bind(this);
 			this.navigateAway = navigateAway.bind(this);
 			this.navigateTo = navigateTo.bind(this);
-			this.register = register.bind(this);		
+			this.register = register.bind(this);
+			this.dispose = dispose.bind(this);		
+
 		}
 	};
 

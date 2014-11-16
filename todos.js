@@ -198,8 +198,9 @@ $(function(){
 	// view_section_begin
 
 	function addLog(ctx, ignoreHistory) {
-		console.log(ctx.url);
-		$('<div class="log ' + (ignoreHistory ? 'not-saved' : '') + '"/>').append($('<div/>').html(ctx.url)).append($('<div/>').html(ctx.path))
+		var routingUsed = ctx.url.indexOf('#') === -1 ? "  (path routed)" : "  (hash routed)";
+		console.log(ctx.url, routingUsed);
+		$('<div class="log ' + (ignoreHistory ? 'not-saved' : '') + '"/>').append($('<div/>').html(ctx.url)).append($('<div/>').html(ctx.path + routingUsed))
 			.prependTo($('#logs-container'))[0].scrollIntoView();
 		$('#logs-section').slideDown().css({display: 'inline-block'});
 	}
