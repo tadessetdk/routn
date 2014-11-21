@@ -56,16 +56,13 @@ var routn = (function(){
 			}
 
 		}
-
-		var hasHash =  hashIndex !== -1;
-		if(!hasHash){
-			var queryIndex = path.indexOf('?');
-			if(queryIndex !== -1){
-				path = path.substring(0, queryIndex);
-			}
+	
+		var queryIndex = path.indexOf('?');
+		if(queryIndex !== -1){
+			path = path.substring(0, queryIndex);
 		}
-
-		return { path: path, hasHash: hasHash };
+		
+		return { path: path, hasHash: hashIndex !== -1 };
 	}
 
 	function navigatePropagate(e, url, path){

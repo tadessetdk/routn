@@ -67,7 +67,7 @@ Usage
 			//delete todo using id
 		} ],
 
-		["/todo/:id/delete/:history_id/history", false, 
+		["/todo/:id/delete/:history_id/view", 
 				{ id: /\d+/, history_id: /^[a-z0-9]+$/i  },  function(context){
 
 			var id = context.params.id;
