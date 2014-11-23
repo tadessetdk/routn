@@ -16,10 +16,12 @@ var routn = (function(){
 
 	function handlePopState(e){
 		handlePathChange(e);
+		if(isIE()) ignoreIEPopStateHashChangeTrigger = true;
 	}
 
 	function handleHashChange(e){
-		if(isIE()) handlePathChange(e);
+		if(!ignoreIEPopStateHashChangeTrigger && isIE()) handlePathChange(e);
+		ignoreIEPopStateHashChangeTrigger = false;
 	}
 
 	function handleClick(e){
@@ -28,26 +30,15 @@ var routn = (function(){
 
 		var destUrl = e.target ? e.target.href : null;
 		if(destUrl){
-			
-			//IE hash click in the document links does not trigger onhashchange event
+			ignoreIEPopStateHashChangeTrigger = false;
 			var result = getRoutePath(destUrl); 
 			
-			if(result){
+			if(result && (!result.hasHash || isIE())){							
+				navigatePropagate(e, destUrl, result.path);			
+			} 
 
-				if((isIE() && result.hasHash)){							
-					navigatePropagate(e, destUrl, result.path, true);			
-				} else if(!result.hasHash) {				
-					navigatePropagate(e, destUrl, result.path);	
-				}
-
-			}
-			
 		}
 	}
-
-	on(window, 'popstate', handlePopState);
-	on(window, 'hashchange',handleHashChange);
-	on(window, 'click', handleClick);
 
 	function getRoutePath(url){
 
@@ -65,31 +56,24 @@ var routn = (function(){
 			}
 
 		}
-
-		var hasHash =  hashIndex !== -1;
-		if(!hasHash){
-			var queryIndex = path.indexOf('?');
-			if(queryIndex !== -1){
-				path = path.substring(0, queryIndex);
-			}
+	
+		var queryIndex = path.indexOf('?');
+		if(queryIndex !== -1){
+			path = path.substring(0, queryIndex);
 		}
-
-		return { path: path, hasHash: hasHash };
+		
+		return { path: path, hasHash: hashIndex !== -1 };
 	}
 
-	function navigatePropagate(e, url, path, propagate){
+	function navigatePropagate(e, url, path){
 
 		if(/^\/.*$/.test(path)) {
 
-			if(isIgnoreHistory(path)) propagate = false;
-
-			if(!propagate){
-				e.preventDefault();
-				if(e.stopImmediatePropagation) e.stopImmediatePropagation();
-				if(e.stopPropagation) e.stopPropagation();
-				if(e.cancelBubble) e.cancelBubble = true;
-			}
-
+			e.preventDefault();
+			if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+			if(e.stopPropagation) e.stopPropagation();
+			if(typeof e.cancelBubble === 'boolean') e.cancelBubble = true;
+			
 			transitionTo(url, path, e.state);
 
 		}
@@ -317,6 +301,7 @@ var routn = (function(){
 		if(route){
 			context.params = route.params;
 			executeHandler(route.handlers, context, route.route, 0);
+			ignoreIEPopStateHashChangeTrigger = false;
 		}
 
 	}
@@ -463,9 +448,14 @@ var routn = (function(){
 		return this;
 	}
 
+	on(window, 'popstate', handlePopState);
+	on(window, 'hashchange',handleHashChange);
+	on(window, 'click', handleClick);
+
 	var useHashForRouting = true,
 		registeredRoutes = {}, 
-		routesWithoutHistory = {};
+		routesWithoutHistory = {},
+		ignoreIEPopStateHashChangeTrigger = false;
 
 	return new function(){		
 		if(!(window.history && window.history.pushState && window.history.replaceState)){

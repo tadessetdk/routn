@@ -13,7 +13,7 @@
 
 		["/product/:id/edit", { id: /\d+/ }, false /* do not add to history, good for update operations*/, log ],
 
-		["/product/:id/edit/:history_id/history", { id: /\d+/, history_id: /^[a-z0-9]+$/i }, false /* do not add to history, good for update operations*/, log ],
+		["/product/:id/edit/:history_id/view", { id: /\d+/, history_id: /^[a-z0-9]+$/i } /* do not add to history, good for update operations*/, log ],
 
 		["/product/:id/save", false /* do not add to history */, function(ctx, route, next){
 
@@ -60,7 +60,7 @@
 	]);
 
 	function log(ctx, route, next){
-		console.log('%s - routed to - %s', ctx.url, route);
+		console.log('%s - matched to route %s', ctx.url, route);
 	}
 
     var products = [
@@ -73,10 +73,10 @@
 	routn.navigateTo('/products', products);
 	routn.navigateTo('/product/3/edit', products);
 	routn.navigateTo('/product/scott/edit', products);
-	routn.navigateTo('/product/3/edit/2/history', products);
-	routn.navigateTo('/product/sam/edit/2/history', products);
-	routn.navigateTo('/product/3/edit/burg/history', products);
-	routn.navigateTo('/product/joe/edit/black/history', products);
+	routn.navigateTo('/product/3/edit/2/view', products);
+	routn.navigateTo('/product/sam/edit/2/view', products);
+	routn.navigateTo('/product/3/edit/burg/view', products);
+	routn.navigateTo('/product/joe/edit/black/view', products);
 	routn.navigateTo('/product/5', products);
 	routn.navigateTo('/products/add');
 	routn.navigateTo('/product/add');
