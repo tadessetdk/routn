@@ -92,7 +92,7 @@ Usage
 	);
 ```
 
-####disable hash and use relative path instead
+####disable hash and use history API instead
 ```javascript 
 	routn.setup({ useHash: false })
 ```
