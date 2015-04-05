@@ -1,12 +1,12 @@
 Routn
 -----
-A simple JavaScript routing library based on History APIs
+A simple JavaScript routing library based on hash or history APIs
 
 Features
 ---------
-- routes based on hash or relative path 
+- routes based on hash or history API 
 	- hash enabled by default
-	- if disabled, relative path will be used 
+	- if disabled, history will be used 
 - intercepts link clicks on the document and route them
 - update route context data in history
 - option to skip history of mutating actions
@@ -56,7 +56,7 @@ Usage
 	);
 ```
 
-####constraining route parameters with Regex
+####constraining route parameters with regex
 	- parametes are treated as string by default
 	- use regex if you need to constraint them
 
@@ -103,7 +103,7 @@ Usage
 		["/todo/:id/delete", false, function(context, next){
 			var id = context.params.id;
 			//your code here
-			next(); // will invoke the next handler below
+			next(); // will invoke the next handler in the pipeline
 			//...
 		}, function(context, next){
 			// called when next() is executed in a preceding handler
@@ -114,7 +114,7 @@ Usage
 
 ####manual navigation
 	- use routn.navigateTo(url, data) to go to a route
-	- the data will be passed to the route handlers
+	- the data will be passed to the route handlers in the pipeline
 
 ```javascript 
 	routn.navigateTo('/todos', todos);	
@@ -128,7 +128,7 @@ Usage
 
 Support
 -------
-- IE10+, and latest browsers
+- IE10+, Chrome, Firefox, Opera, Safari
 
 License
 --------
