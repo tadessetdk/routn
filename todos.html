@@ -13,7 +13,7 @@
 
 		body, input{
 			font-family: "wf_SegoeUILight","wf_SegoeUI","Segoe UI Light","Segoe WP Light","Segoe UI","Segoe","Segoe WP","Tahoma","Verdana","Arial","sans-serif";
-			font-size:13px;
+			font-size:1em;
 		}
 
 		a{
@@ -106,7 +106,7 @@
 		}
 
 		#logs-section{
-			margin: 51px 16px 16px 16px;
+			margin: 16px;
 			padding: 8px;
 			border: dotted 1px #DDD;
 			font-style: italic;
@@ -128,10 +128,11 @@
 		}
 
 		#logs-container{
-			padding: 0 16px;
+		    	padding: 0 16px;
 			max-height: 600px;
 			overflow: auto;
-			width: 350px;
+    			max-width: 400px;
+    			overflow-x: hidden;
 		}
 
 		#logs-container .log{
